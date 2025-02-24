@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".ui.auth.login.LoginActivity">
+    <!-- Title -->
+    <TextView
+        android:id="@+id/loginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/masuk_disini"
+        android:textSize="24sp"
+        android:textColor="@color/bluePrimary"
+        android:fontFamily="@font/Inter_Bold"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="40dp"
+    android:textAlignment="center"/>
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/loginSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/selamat_datang_kembali_kami_senang_anda_kembali"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:fontFamily="@font/Inter_Regular"
+        app:layout_constraintTop_toBottomOf="@id/loginTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:textAlignment="center"/>
+
+    <!-- Email Input Field -->
+    <com.example.app_skripsi.customview.CustomTextField
+        android:id="@+id/emailField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:textColorHint="@color/gray500"
+        app:layout_constraintTop_toBottomOf="@id/loginSubtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp"
+        />
+
+    <!-- Password Input Field -->
+    <com.example.app_skripsi.customview.CustomTextField
+        android:id="@+id/passwordField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:textColorHint="#9E9E9E"
+        app:layout_constraintTop_toBottomOf="@id/emailField"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Forgot Password Link -->
+    <TextView
+        android:id="@+id/forgotPasswordLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lupa_kata_sandi"
+        android:textColor="@color/bluePrimary"
+        android:textSize="15sp"
+        android:fontFamily="@font/Inter_Medium"
+        app:layout_constraintTop_toBottomOf="@id/passwordField"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textAlignment="center"
+        android:layout_marginTop="30dp" />
+
+    <!-- Login Button -->
+    <com.example.app_skripsi.customview.CustomButton
+        android:id="@+id/loginButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/masuk"
+        android:enabled="false"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/forgotPasswordLink"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_margin="20dp"
+        android:backgroundTint="@color/bluePrimary"
+        android:layout_marginTop="30dp"/>
+
+    <!-- Sign Up Link -->
+    <TextView
+        android:id="@+id/signupLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/daftarkan_diri_anda"
+        android:textColor="@color/gray800"
+        android:textSize="14sp"
+        android:fontFamily="@font/Inter_Medium"
+        app:layout_constraintTop_toBottomOf="@id/loginButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
+        android:textAlignment="center" />
+</androidx.constraintlayout.widget.ConstraintLayout>

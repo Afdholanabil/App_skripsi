@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">App_Skripsi</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="masuk_disini">Masuk disini</string>
+    <string name="selamat_datang_kembali_kami_senang_anda_kembali">Selamat datang kembali, kami senang anda kembali !</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="lupa_kata_sandi">Lupa kata sandi ?</string>
+    <string name="masuk">Masuk</string>
+    <string name="daftarkan_diri_anda">Daftarkan diri anda</string>
+</resources>
