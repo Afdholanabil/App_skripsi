@@ -9,4 +9,7 @@
     <string name="lupa_kata_sandi">Lupa kata sandi ?</string>
     <string name="masuk">Masuk</string>
     <string name="daftarkan_diri_anda">Daftarkan diri anda</string>
+    <string name="daftarkan_akun_anda">Daftarkan Akun Anda !</string>
+    <string name="daftarkan_akun_anda_sekarang_semua_data_yang_anda_masukan_aman">Daftarkan akun anda sekarang. Semua data yang anda masukan aman !</string>
+    <string name="nama_anda">Nama anda</string>
 </resources>

@@ -38,31 +38,56 @@
         android:textAlignment="center"/>
 
     <!-- Email Input Field -->
-    <com.example.app_skripsi.customview.CustomTextField
-        android:id="@+id/emailField"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlEmailField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:textColorHint="@color/gray500"
         app:layout_constraintTop_toBottomOf="@id/loginSubtitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="40dp"
-        />
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/gray500"
+        app:boxStrokeWidth="2dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp">
+
+        <com.example.app_skripsi.customview.CustomTextField
+            android:id="@+id/emailField"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Password Input Field -->
-    <com.example.app_skripsi.customview.CustomTextField
-        android:id="@+id/passwordField"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlPasswordField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/password"
-        android:inputType="textPassword"
-        android:textColorHint="#9E9E9E"
-        app:layout_constraintTop_toBottomOf="@id/emailField"
+        app:layout_constraintTop_toBottomOf="@id/tlEmailField"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/gray500"
+        app:boxStrokeWidth="2dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp">
+
+        <com.example.app_skripsi.customview.CustomTextField
+            android:id="@+id/passwordField"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Forgot Password Link -->
     <TextView
@@ -73,7 +98,7 @@
         android:textColor="@color/bluePrimary"
         android:textSize="15sp"
         android:fontFamily="@font/Inter_Medium"
-        app:layout_constraintTop_toBottomOf="@id/passwordField"
+        app:layout_constraintTop_toBottomOf="@id/tlPasswordField"
         app:layout_constraintEnd_toEndOf="parent"
         android:textAlignment="center"
         android:layout_marginTop="30dp" />

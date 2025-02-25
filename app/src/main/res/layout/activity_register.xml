@@ -5,6 +5,235 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="20dp"
     tools:context=".ui.auth.register.RegisterActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- Title -->
+            <TextView
+                android:id="@+id/registerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daftarkan Akun Anda !"
+                android:textSize="24sp"
+                android:textColor="@color/bluePrimary"
+                android:fontFamily="@font/Inter_Bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="40dp"
+                android:textAlignment="center" />
+
+            <!-- Subtitle -->
+            <TextView
+                android:id="@+id/registerSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daftarkan akun anda sekarang. Semua data yang anda masukan aman !"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:fontFamily="@font/Inter_Regular"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@id/registerTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp" />
+
+            <!-- Name Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlNama"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Nama anda"
+                app:layout_constraintTop_toBottomOf="@id/registerSubtitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="30dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/nameField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:inputType="textPersonName" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Email Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                app:layout_constraintTop_toBottomOf="@id/tlNama"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/emailField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Umur Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlUmur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Umur"
+                app:layout_constraintTop_toBottomOf="@id/tlEmail"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/ageField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Jenis Kelamin Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlGender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Jenis Kelamin"
+                app:layout_constraintTop_toBottomOf="@id/tlUmur"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/genderField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlPassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Kata Sandi"
+                app:layout_constraintTop_toBottomOf="@id/tlGender"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/passwordField"
+                    android:layout_width="match_parent"
+                    android:padding="16dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Confirm Password Field -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlConfirmPassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Masukan ulang kata sandi"
+                app:layout_constraintTop_toBottomOf="@id/tlPassword"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@color/gray500"
+                app:boxStrokeWidth="2dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.example.app_skripsi.customview.CustomTextField
+                    android:id="@+id/confirmPasswordField"
+                    android:layout_width="match_parent"
+                    android:padding="16dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Register Button -->
+            <com.example.app_skripsi.customview.CustomButton
+                android:id="@+id/registerButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Daftar"
+                android:textColor="@android:color/white"
+                android:enabled="false"
+                app:layout_constraintTop_toBottomOf="@id/tlConfirmPassword"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="30dp" />
+
+            <!-- Sign In Link -->
+            <TextView
+                android:id="@+id/signInLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sudah punya akun? Masuk"
+                android:textColor="@color/gray800"
+                android:textSize="14sp"
+                android:fontFamily="@font/Inter_Medium"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@id/registerButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="20dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
