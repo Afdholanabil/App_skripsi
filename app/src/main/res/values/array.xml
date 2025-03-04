@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="gender_array">
+        <item>Laki-Laki</item>
+        <item>Perempuan</item>
+    </string-array>
+
+    <string-array name="emotion_today">
+        <item>Bahagia</item>
+        <item>Sedih</item>
+        <item>Normal</item>
+        <item>Marah</item>
+        <item>Kecewa</item>
+    </string-array>
+
+    <string-array name="activity_today">
+        <item>Belajar/Bekerja</item>
+        <item>Istirahat</item>
+        <item>Hiburan</item>
+        <item>Sosialisasi</item>
+        <item>Berolahraga</item>
+    </string-array>
+</resources>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="20dp"
+    tools:context=".ui.profile.diary.fragments.CreateDiaryFragment">
+
+    <!-- Tombol Back -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Judul Halaman -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buat Buku Harian"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter_medium"
+        app:layout_constraintStart_toEndOf="@id/btnBack"
+        app:layout_constraintTop_toTopOf="@id/btnBack"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
+        android:layout_marginStart="20dp"/>
+
+    <!-- Pertanyaan -->
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bagaimana perasaan mu hari ini ?"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Pilihan Emosi -->
+    <LinearLayout
+        android:id="@+id/emotionSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toBottomOf="@id/tvQuestion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:id="@+id/ivHappy"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_happy"
+            app:tint="@color/bluePrimary" />
+
+        <ImageView
+            android:id="@+id/ivSad"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_sad"
+            android:layout_marginStart="12dp"
+            app:tint="@color/gray400" />
+
+        <ImageView
+            android:id="@+id/ivNeutral"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_normal"
+            android:layout_marginStart="12dp"
+            app:tint="@color/gray400" />
+
+        <ImageView
+            android:id="@+id/ivAngry"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_angry"
+            android:layout_marginStart="12dp"
+            app:tint="@color/gray400" />
+
+        <ImageView
+            android:id="@+id/ivFrustrated"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_frustated"
+            android:layout_marginStart="12dp"
+            app:tint="@color/gray400" />
+    </LinearLayout>
+
+    <!-- Spinner Aktivitas -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlActivityType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Apa yang anda lakukan hari ini"
+        app:endIconMode="dropdown_menu"
+        app:layout_constraintTop_toBottomOf="@id/emotionSelector"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/gray500"
+        app:boxStrokeWidth="2dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp"
+        android:layout_marginTop="24dp">
+
+        <AutoCompleteTextView
+            android:id="@+id/actvActivityType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:fontFamily="@font/inter_medium"
+            android:textSize="14sp"
+            android:inputType="none"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Input Judul -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Masukan judul"
+        app:layout_constraintTop_toBottomOf="@id/tlActivityType"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/gray500"
+        app:boxStrokeWidth="2dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp"
+        android:layout_marginTop="16dp">
+
+        <com.example.app_skripsi.customview.CustomTextField
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Input Isi Buku Harian -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tlContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Apa yang terjadi hari ini ?"
+        app:layout_constraintTop_toBottomOf="@id/tlTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/gray500"
+        app:boxStrokeWidth="2dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp"
+        android:layout_marginTop="16dp">
+
+        <com.example.app_skripsi.customview.CustomTextField
+            android:id="@+id/etContent"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:padding="16dp"
+            android:gravity="top"
+            android:maxLines="5"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Tombol Simpan -->
+    <com.example.app_skripsi.customview.CustomButton
+        android:id="@+id/btnSaveDiary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/buat_diary"
+        android:enabled="true"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="40dp"
+
+      />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

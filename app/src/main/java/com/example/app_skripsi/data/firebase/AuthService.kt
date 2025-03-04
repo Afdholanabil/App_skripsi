@@ -25,6 +25,16 @@ class AuthService(private val auth: FirebaseAuth = FirebaseAuth.getInstance()) {
         }
     }
 
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        return try {
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
     fun logoutUser() {
         auth.signOut()
     }

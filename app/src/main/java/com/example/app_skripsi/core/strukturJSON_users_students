@@ -1,0 +1,51 @@
+{
+  "users_students": {
+    "data": {
+      "userId_12345": {
+        "email": "user@example.com",
+        "jenis_kelamin": "Laki-laki",
+        "nama": "User",
+        "umur": 25,
+        "DeteksiRutin": {
+          "sesi_1": {
+            "aktif": true,
+            "deteksiHarian": {
+              "1": {
+                "emosi": "Sedih",
+                "kegiatan": "Olahraga",
+                "tanggal": "2025-03-01T12:00:00Z"
+              },
+              "2": {
+                "emosi": "Senang",
+                "kegiatan": "Bekerja",
+                "tanggal": "2025-03-02T12:00:00Z"
+              }
+            },
+            "periode": "1_bulan",
+            "tanggal_mulai": "2025-03-01T12:00:00Z",
+            "tanggal_selesai": "2025-03-31T12:00:00Z"
+          }
+        },
+        "DeteksiSingkat": {
+          "deteksi_singkat_1": {
+            "emosi": "Marah",
+            "kegiatan": "Hiburan",
+            "tanggal": "2025-03-03T12:00:00Z",
+            "tingkat_kecemasan": 3
+          }
+        },
+        "Diary": {
+          "diary_1": {
+            "isiDiary": {
+              "emosi": "Senang",
+              "kegiatan": "Sosialisasi",
+              "judul": "Hari yang indah",
+              "isi": "Hari ini saya bertemu teman lama dan berbincang lama."
+            },
+            "tanggal": "2025-03-03T12:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}

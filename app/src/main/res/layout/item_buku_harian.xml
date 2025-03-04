@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    app:cardCornerRadius="20dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/gray800"
+    android:layout_marginBottom="10dp"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp">
+
+        <!-- Tanggal -->
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12/2/2025"
+            android:fontFamily="@font/inter_semi_bold"
+            android:textSize="14sp"
+            android:textColor="@color/gray800"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- Judul -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kecopetan Dijalan:("
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/gray800"
+            android:fontFamily="@font/inter_semi_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"/>
+
+        <!-- Isi Diary -->
+        <TextView
+            android:id="@+id/tvContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Pada hari ini aku bisa nya kecopetan dijalan waktu pulang kerja..."
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:fontFamily="@font/inter_light"
+            android:textColor="@color/gray700"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"/>
+
+        <!-- Tipe Aktivitas -->
+        <TextView
+            android:id="@+id/tvActivityType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bekerja"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_activity_type"
+            android:padding="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivEmotion"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"/>
+
+        <!-- Icon Emosi -->
+        <ImageView
+            android:id="@+id/ivEmotion"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_sad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvActivityType"
+            app:layout_constraintTop_toTopOf="@id/tvActivityType"
+
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

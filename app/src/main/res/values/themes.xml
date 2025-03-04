@@ -6,4 +6,21 @@
     </style>
 
     <style name="Theme.App_Skripsi" parent="Base.Theme.App_Skripsi" />
+
+    <style name="HintTextStyle">
+        <item name="android:textColor">@color/gray500</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/inter_regular</item>
+    </style>
+
+
+
+    <style name="Widget.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
+
+<!--        <item name="android:backgroundTint">@color/black</item>-->
+<!--        <item name="cardForegroundColor">@color/black</item>-->
+        <item name="android:background">@color/bottomNavBG</item>
+    </style>
+
+
 </resources>

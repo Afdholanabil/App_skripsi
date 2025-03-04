@@ -4,6 +4,9 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="bluePrimary">#10439F</color>
+    <color name="blueSecondary">#587FC7</color>
+    <color name="bottomNavBG">#CCD4DF</color>
+
     <color name="purplePrimary">#7469B6</color>
     <color name="purpleSecondary">#AD88C6</color>
     <color name="thirtary">#FFE6E6</color>

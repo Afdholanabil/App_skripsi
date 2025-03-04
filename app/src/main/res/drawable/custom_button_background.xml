@@ -2,7 +2,7 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/bluePrimary" />
-    <corners android:radius="30dp" /> <!-- Sesuaikan radius sesuai gambar -->
+    <corners android:radius="60dp" /> <!-- Sesuaikan radius sesuai gambar -->
     <padding
         android:top="12dp"
         android:bottom="12dp"

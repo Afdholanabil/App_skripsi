@@ -13,16 +13,35 @@
         android:theme="@style/Theme.App_Skripsi"
         tools:targetApi="31">
         <activity
+            android:name=".ui.profile.AboutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.FaqActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.RiwayatCheckActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.VideoListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.diary.DiaryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.dashboard.DashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.forgotPw.ForgotPwActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.splashscreen.SplashScreenActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.register.RegisterActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.auth.login.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,6 +49,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
