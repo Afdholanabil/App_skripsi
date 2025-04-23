@@ -8,12 +8,11 @@ import com.example.app_skripsi.ui.auth.forgotPw.ForgotPasswordViewModel
 import com.example.app_skripsi.ui.auth.login.LoginViewModel
 import com.example.app_skripsi.ui.auth.register.RegisterViewModel
 
+@Suppress("UNCHECKED_CAST")
 class AuthViewModelFactory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
-            modelClass.isAssignableFrom(com.example.app_skripsi.ui.auth.login.LoginViewModel::class.java) -> {
-                LoginViewModel(authRepository) as T
-            }
+
             modelClass.isAssignableFrom(com.example.app_skripsi.ui.auth.register.RegisterViewModel::class.java) -> {
                 RegisterViewModel(authRepository) as T
             }

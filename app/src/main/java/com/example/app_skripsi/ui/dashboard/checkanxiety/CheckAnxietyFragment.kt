@@ -1,60 +1,165 @@
 package com.example.app_skripsi.ui.dashboard.checkanxiety
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.app_skripsi.R
+import com.example.app_skripsi.data.local.RoutineSessionManager
+import com.example.app_skripsi.databinding.FragmentCheckAnxietyBinding
+import com.example.app_skripsi.ui.checkanxiety.FormAnxietyActivity
+import com.example.app_skripsi.utils.ToastUtils
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CheckAnxietyFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CheckAnxietyFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentCheckAnxietyBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var routineSessionManager: RoutineSessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            // Handle any arguments here if needed
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_check_anxiety, container, false)
+    ): View {
+        _binding = FragmentCheckAnxietyBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        routineSessionManager = RoutineSessionManager(requireContext())
+
+        // Di dalam method onViewCreated di CheckAnxietyFragment
+        binding.btnCheckAnxietyRoutine.setOnClickListener {
+            lifecycleScope.launch {
+                // Periksa sesi aktif dan status pengisian
+                val isSessionActive = routineSessionManager.isSessionStillActive()
+
+                if (isSessionActive) {
+                    val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
+
+                    if (hasCompletedToday) {
+                        ToastUtils.showToast(
+                            requireContext(),
+                            "Anda sudah mengisi form deteksi kecemasan hari ini",
+                            Toast.LENGTH_LONG,
+                            position = ToastUtils.Position.TOP
+                        )
+                        return@launch
+                    }
+                }
+
+                // Jika belum mengisi atau tidak ada sesi aktif, buka FormAnxietyActivity
+                val intent = Intent(requireContext(), FormAnxietyActivity::class.java)
+                intent.putExtra("DETECTION_TYPE", "ROUTINE")
+                startActivity(intent)
+            }
+        }
+
+        // Cek status sesi rutin setiap kali fragment muncul
+        checkRoutineSessionStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Update status sesi ketika fragment kembali muncul
+        checkRoutineSessionStatus()
+    }
+
+    private fun checkRoutineSessionStatus() {
+        lifecycleScope.launch {
+            try {
+                val isSessionActive = routineSessionManager.isSessionStillActive()
+                Log.d("CheckAnxietyFragment", "Session active: $isSessionActive")
+
+                if (isSessionActive) {
+                    // Sesi aktif, tampilkan informasi sesi
+                    val sessionType = routineSessionManager.getSessionTypeDisplay()
+                    val currentDay = routineSessionManager.getCurrentSessionDay()
+                    val totalDays = routineSessionManager.getSessionDurationInDays()
+                    val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
+
+                    Log.d("CheckAnxietyFragment",
+                        "Session info - Type: $sessionType, Day: $currentDay/$totalDays, Completed today: $hasCompletedToday")
+
+                    binding.tvTitle.text = "Deteksi Rutin"
+                    binding.tvDescAnxiety.text = "Sesi $sessionType aktif"
+                    binding.tvDayAnxiety.visibility = View.VISIBLE
+                    binding.tvDayAnxiety.text = "Hari $currentDay dari $totalDays"
+
+                    if (hasCompletedToday) {
+                        binding.btnCheckAnxietyRoutine.text = "Sudah Diisi Hari Ini"
+                        binding.tvCheckAnxietyPeriodic.text = "Anda sudah mengisi form deteksi kecemasan hari ini"
+                        binding.btnCheckAnxietyRoutine.isEnabled = false
+                        // Ubah warna button menjadi abu-abu
+                        binding.btnCheckAnxietyRoutine.setBackgroundColor(
+                            ContextCompat.getColor(requireContext(), R.color.gray400)
+                        )
+
+                        // Opsional: Ubah warna teks juga agar lebih kontras
+                        binding.btnCheckAnxietyRoutine.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.gray700)
+                        )
+                    } else {
+                        binding.btnCheckAnxietyRoutine.text = "Lanjutkan Sesi"
+                        binding.btnCheckAnxietyRoutine.isEnabled = true
+                        binding.tvCheckAnxietyPeriodic.text = "Lanjutkan sesi deteksi kecemasan rutin Anda"
+                        // Kembalikan warna button ke normal
+                        binding.btnCheckAnxietyRoutine.setBackgroundColor(
+                            ContextCompat.getColor(requireContext(), R.color.bluePrimary)
+                        )
+
+                        // Kembalikan warna teks ke normal
+                        binding.btnCheckAnxietyRoutine.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.white)
+                        )
+                    }
+                } else {
+                    // Tidak ada sesi aktif, tampilkan UI default
+                    binding.tvTitle.text = "Deteksi Rutin"
+                    binding.tvDescAnxiety.text = "Anda belum memulai sesi Deteksi Rutin !"
+                    binding.tvDayAnxiety.visibility = View.GONE
+
+                    binding.btnCheckAnxietyRoutine.text = "Mulai Sesi"
+                    binding.btnCheckAnxietyRoutine.isEnabled = true
+                    binding.tvCheckAnxietyPeriodic.text = "Apakah anda ingin memulai sesi rutin untuk deteksi kecemasan anda?"
+                }
+            } catch (e: Exception) {
+                Log.e("CheckAnxietyFragment", "Error checking routine session status", e)
+                // Tampilkan UI default jika terjadi error
+                binding.tvTitle.text = "Deteksi Rutin"
+                binding.tvDescAnxiety.text = "Terjadi kesalahan saat memeriksa status sesi"
+                binding.tvDayAnxiety.visibility = View.GONE
+                binding.btnCheckAnxietyRoutine.isEnabled = true
+                binding.btnCheckAnxietyRoutine.text = "Coba Lagi"
+            }
+        }
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CheckAnxietyFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             CheckAnxietyFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    // Setup arguments if needed
                 }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

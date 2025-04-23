@@ -12,24 +12,41 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.example.app_skripsi.MainActivity
 import com.example.app_skripsi.R
 import com.example.app_skripsi.data.firebase.FirebaseService
+import com.example.app_skripsi.data.local.AppDatabase
+import com.example.app_skripsi.data.local.SessionManager
+import com.example.app_skripsi.data.local.user.UserDao
+import com.example.app_skripsi.data.local.user.UserEntity
 import com.example.app_skripsi.data.repository.AuthRepository
+import com.example.app_skripsi.data.repository.UserRepository
 import com.example.app_skripsi.databinding.ActivityLoginBinding
 import com.example.app_skripsi.ui.auth.AuthViewModelFactory
 import com.example.app_skripsi.ui.auth.forgotPw.ForgotPwActivity
 import com.example.app_skripsi.ui.auth.register.RegisterActivity
 import com.example.app_skripsi.ui.dashboard.DashboardActivity
 import com.example.app_skripsi.utils.ToastUtils
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
     private var _binding : ActivityLoginBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: LoginViewModel by viewModels {
-        AuthViewModelFactory(AuthRepository(FirebaseService()))
+        val database = AppDatabase.getDatabase(application) // Get Room database instance
+        val userDao = database.userDao() // Get UserDao from database
+
+        LoginViewModelFactory(
+            application,
+            AuthRepository(FirebaseService()),
+            UserRepository(FirebaseService(), userDao)
+        )
     }
+
+
     private var email:String? = null
 
     private var backPresssedTime : Long= 0
@@ -98,22 +115,44 @@ class LoginActivity : AppCompatActivity() {
                 if (user != null) {
                     ToastUtils.showToast(this, "Login berhasil!", position = ToastUtils.Position.BOTTOM)
 
-                    val intent = Intent(this, DashboardActivity::class.java).apply {
-                        putExtra("USER_NAME", user.nama)
-                        putExtra("USER_EMAIL", user.email)
-                        putExtra("USER_GENDER", user.jenisKelamin)
-                        putExtra("USER_AGE", user.umur)
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-                    finish()
+                    saveSessionAndNavigate(user)
+//                    val intent = Intent(this, DashboardActivity::class.java).apply {
+//                        putExtra("USER_NAME", user.nama)
+//                        putExtra("USER_EMAIL", user.email)
+//                        putExtra("USER_GENDER", user.jenisKelamin)
+//                        putExtra("USER_AGE", user.umur)
+//                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+//                    }
+//                    startActivity(intent)
+//                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+//                    finish()
                 }
             } else {
                 ToastUtils.showToast(this, "Login gagal: ${result.exceptionOrNull()?.message}", position = ToastUtils.Position.TOP)
                 Log.e(TAG,"Login gagal: ${result.exceptionOrNull()?.message}")
             }
         })
+    }
+
+    private fun saveSessionAndNavigate(user: UserEntity) {
+        // Simpan session userId dan token
+        val userId = user.userId
+        val token = "dummy_token"  // Ganti dengan token yang didapat dari Firebase
+        val expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)
+
+        lifecycleScope.launch {
+            // Simpan session di SessionManager
+            val sessionManager = SessionManager(application)
+            sessionManager.saveSession(token, userId, expiresAt)
+
+            // Pindah ke DashboardActivity dengan membawa data userId
+            val intent = Intent(this@LoginActivity, DashboardActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish()
+        }
     }
 
     // ✅ Helper function untuk validasi field

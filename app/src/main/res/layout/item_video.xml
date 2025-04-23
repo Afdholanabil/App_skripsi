@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="12dp"
-    android:layout_margin="8dp"
+    android:layout_marginBottom="8dp"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -25,21 +25,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Video Yoga dalam 1 menit"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="@font/inter_bold"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"/>
 
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Yoga relaksasi dalam 1 menit.\n1. Peregangan Otot kaki\n2. Pengambilan nafas"
-            android:textSize="14sp"
-            android:fontFamily="@font/inter_regular"
-            android:textColor="@color/gray800"
-            android:layout_marginTop="4dp"/>
+<!--        <TextView-->
+<!--            android:id="@+id/tvDescription"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Yoga relaksasi dalam 1 menit.\n1. Peregangan Otot kaki\n2. Pengambilan nafas"-->
+<!--            android:textSize="14sp"-->
+<!--            android:fontFamily="@font/inter_regular"-->
+<!--            android:textColor="@color/gray800"-->
+<!--            android:layout_marginTop="4dp"/>-->
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

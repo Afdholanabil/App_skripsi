@@ -6,6 +6,7 @@
     <color name="bluePrimary">#10439F</color>
     <color name="blueSecondary">#587FC7</color>
     <color name="bottomNavBG">#CCD4DF</color>
+    <color name="redError">#F35656</color>
 
     <color name="purplePrimary">#7469B6</color>
     <color name="purpleSecondary">#AD88C6</color>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -56,9 +57,9 @@ class CreateDiaryFragment : Fragment() {
         emotionMap = mapOf(
             binding.ivHappy to "Senang",
             binding.ivSad to "Sedih",
-            binding.ivNeutral to "Normal",
+            binding.ivNormal to "Normal",
             binding.ivAngry to "Marah",
-            binding.ivFrustrated to "Kecewa"
+            binding.ivFrustated to "Kecewa"
         )
 
         val actitityToday = resources.getStringArray(R.array.activity_today)
@@ -83,7 +84,26 @@ class CreateDiaryFragment : Fragment() {
             emotionMap.forEach { (imageView, emotion) ->
                 val color = if (emotion == selectedEmotion) R.color.bluePrimary else R.color.gray400
                 imageView.setColorFilter(ContextCompat.getColor(requireContext(), color))
+
+                if (emotion == selectedEmotion) {
+                    // Make TextView visible for selected emotion
+                    getEmotionTextView(emotion)?.visibility = View.VISIBLE
+                } else {
+                    // Hide TextView for unselected emotions
+                    getEmotionTextView(emotion)?.visibility = View.GONE
+                }
             }
+        }
+    }
+    // Function to get TextView based on selected emotion
+    private fun getEmotionTextView(emotion: String): TextView? {
+        return when (emotion) {
+            "Senang" -> binding.tvHappy
+            "Sedih" -> binding.tvSad
+            "Normal" -> binding.tvNormal
+            "Marah" -> binding.tvAngry
+            "Kecewa" -> binding.tvFrustated
+            else -> null
         }
     }
 

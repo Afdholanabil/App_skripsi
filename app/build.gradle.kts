@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
+    id("kotlin-parcelize")
+    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -56,7 +59,18 @@ dependencies {
     implementation (libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation (libs.androidx.datastore.preferences)
+    implementation (libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler) // Pastikan compiler ada
+    implementation (libs.androidx.room.ktx) // Coroutine Support
+    implementation (libs.androidx.work.runtime)
 
+    // Media3 (ExoPlayer)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
 
-
+    // Untuk mengambil gambar thumbnail
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
 }

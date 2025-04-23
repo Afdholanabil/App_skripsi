@@ -30,6 +30,7 @@
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
         android:layout_marginStart="20dp"/>
 
+
     <!-- Pertanyaan -->
     <TextView
         android:id="@+id/tvQuestion"
@@ -55,45 +56,138 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">
 
-        <ImageView
-            android:id="@+id/ivHappy"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_happy"
-            app:tint="@color/bluePrimary" />
+        <LinearLayout
+            android:id="@+id/llHappy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivHappy"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Happy"
+                android:src="@drawable/ic_happy"
+                app:tint="@color/bluePrimary" />
+            <TextView
+                android:id="@+id/tvHappy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Senang"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/bluePrimary"
+                android:visibility="gone"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llSad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivSad"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Sad"
+                android:src="@drawable/ic_sad"
+                app:tint="@color/gray400"
+                />
+            <TextView
+                android:id="@+id/tvSad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sedih"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/bluePrimary"
+                android:visibility="gone"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llNormal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivNormal"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Normal"
+                android:src="@drawable/ic_normal"
+                app:tint="@color/gray400"
+                />
+            <TextView
+                android:id="@+id/tvNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Normal"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/bluePrimary"
+                android:visibility="gone"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llAngry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivAngry"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Angry"
+                android:src="@drawable/ic_angry"
+                app:tint="@color/gray400" />
+            <TextView
+                android:id="@+id/tvAngry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Marah"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/bluePrimary"
+                android:visibility="gone"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llFrustated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivFrustated"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Frustated"
+                android:src="@drawable/ic_frustated"
+                app:tint="@color/gray400" />
+            <TextView
+                android:id="@+id/tvFrustated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kecewa"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/bluePrimary"
+                android:visibility="gone"/>
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/ivSad"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_sad"
-            android:layout_marginStart="12dp"
-            app:tint="@color/gray400" />
 
-        <ImageView
-            android:id="@+id/ivNeutral"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_normal"
-            android:layout_marginStart="12dp"
-            app:tint="@color/gray400" />
-
-        <ImageView
-            android:id="@+id/ivAngry"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_angry"
-            android:layout_marginStart="12dp"
-            app:tint="@color/gray400" />
-
-        <ImageView
-            android:id="@+id/ivFrustrated"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_frustated"
-            android:layout_marginStart="12dp"
-            app:tint="@color/gray400" />
     </LinearLayout>
+
+
 
     <!-- Spinner Aktivitas -->
     <com.google.android.material.textfield.TextInputLayout

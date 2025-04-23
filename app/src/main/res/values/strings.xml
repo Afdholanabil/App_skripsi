@@ -18,4 +18,9 @@
     <string name="video_untuk_anda">Video Untuk Anda</string>
     <string name="buat_diary">Buat Diary</string>
     <string name="segera_deteksi_tingkat_kecemasan_anda">Segera deteksi tingkat kecemasan anda</string>
+    <string name="apa_itu_gad_7">Apa itu GAD 7 ?</string>
+
+    <!-- In strings.xml -->
+    <string name="quick_detection_description">Deteksi singkat ini berisi pertanyaan emosi dan kegiatan yang paling dominan anda pada hari ini. Apakah anda ingin melanjutkan?</string>
+    <string name="routine_detection_description">Deteksi rutin membantu Anda melacak tingkat kecemasan selama periode tertentu. Anda perlu mengisi form ini sekali setiap hari sampai sesi berakhir. Apakah anda ingin melanjutkan?</string>
 </resources>

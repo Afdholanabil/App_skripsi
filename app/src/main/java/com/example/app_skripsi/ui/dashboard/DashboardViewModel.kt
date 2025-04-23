@@ -3,6 +3,9 @@ package com.example.app_skripsi.ui.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.app_skripsi.data.repository.UserRepository
+import kotlinx.coroutines.launch
 
 class DashboardViewModel(): ViewModel()  {
     private val _userName = MutableLiveData<String>()
@@ -10,6 +13,19 @@ class DashboardViewModel(): ViewModel()  {
 
     private val _userEmail = MutableLiveData<String>()
     val userEmail: LiveData<String> get() = _userEmail
+
+    fun loadUserFromSQLite(userRepository: UserRepository, userId: String) {
+        viewModelScope.launch {
+            val localUser = userRepository.getUserFromLocal(userId)
+            if (localUser != null) {
+                _userName.postValue(localUser.nama)
+                _userEmail.postValue(localUser.email)
+                android.util.Log.d("DashboardViewModel", "✅ Loaded user from SQLite: ${localUser.nama}")
+            } else {
+                android.util.Log.e("DashboardViewModel", "⚠️ No user found in SQLite")
+            }
+        }
+    }
 
     fun setUserData(name: String, email: String) {
         _userName.value = name

@@ -5,6 +5,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.app_skripsi.R
 import com.example.app_skripsi.databinding.ActivityAboutBinding
 
@@ -18,8 +19,22 @@ class AboutActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val bottomNav = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(systemBars.left+v.paddingLeft , systemBars.top + v.paddingTop,
+                systemBars.right + v.paddingRight , systemBars.bottom + v.paddingBottom)
             insets
+        }
+//        / Hide status bar & navigation bar
+        hideSystemUI()
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun hideSystemUI() {
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
