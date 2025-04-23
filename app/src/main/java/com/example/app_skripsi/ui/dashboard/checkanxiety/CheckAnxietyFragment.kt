@@ -42,12 +42,76 @@ class CheckAnxietyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         routineSessionManager = RoutineSessionManager(requireContext())
+        firebaseService = FirebaseService()
 
-        // Di dalam method onViewCreated di CheckAnxietyFragment
+        // Setup tombol mulai/lanjutkan sesi
         binding.btnCheckAnxietyRoutine.setOnClickListener {
-            lifecycleScope.launch {
+            handleRoutineButtonClick()
+        }
+
+        // Setup tombol akhiri sesi
+        binding.btnEndAnxietyRoutine.setOnClickListener {
+            showEndSessionConfirmationDialog()
+        }
+
+        // Cek status sesi rutin setiap kali fragment muncul
+        checkRoutineSessionStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Update status sesi ketika fragment kembali muncul
+        checkRoutineSessionStatus()
+    }
+    private fun showEndSessionConfirmationDialog() {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Akhiri Sesi Deteksi Rutin")
+            .setMessage("Apakah Anda yakin ingin mengakhiri sesi deteksi rutin saat ini? Data yang sudah ada akan tetap tersimpan.")
+            .setPositiveButton("Ya, Akhiri") { _, _ ->
+                lifecycleScope.launch {
+                    try {
+                        val success = routineSessionManager.endRoutineSession(firebaseService)
+
+                        if (success) {
+                            Toast.makeText(requireContext(),
+                                "Sesi deteksi rutin berhasil diakhiri",
+                                Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(),
+                                "Gagal mengakhiri sesi deteksi rutin",
+                                Toast.LENGTH_SHORT).show()
+                        }
+
+                        // Refresh status setelah operasi
+                        checkRoutineSessionStatus()
+                    } catch (e: Exception) {
+                        Log.e("CheckAnxietyFragment", "Error saat mengakhiri sesi: ${e.message}")
+                        Toast.makeText(requireContext(),
+                            "Terjadi kesalahan saat mengakhiri sesi",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun handleRoutineButtonClick() {
+        lifecycleScope.launch {
+            try {
+                // Periksa apakah user sudah login
+                val userId = firebaseService.getCurrentUserId()
+                if (userId.isNullOrEmpty()) {
+                    Toast.makeText(requireContext(), "Anda belum login", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Simpan user ID ke RoutineSessionManager
+                routineSessionManager.setUserId(userId)
+
                 // Periksa sesi aktif dan status pengisian
                 val isSessionActive = routineSessionManager.isSessionStillActive()
+
                 if (isSessionActive) {
                     val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
 
@@ -66,22 +130,26 @@ class CheckAnxietyFragment : Fragment() {
                 val intent = Intent(requireContext(), FormAnxietyActivity::class.java)
                 intent.putExtra("DETECTION_TYPE", "ROUTINE")
                 startActivity(intent)
+            } catch (e: Exception) {
+                Log.e("CheckAnxietyFragment", "Error menangani klik tombol: ${e.message}")
+                Toast.makeText(requireContext(), "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // Cek status sesi rutin setiap kali fragment muncul
-        checkRoutineSessionStatus()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Update status sesi ketika fragment kembali muncul
-        checkRoutineSessionStatus()
     }
 
     private fun checkRoutineSessionStatus() {
         lifecycleScope.launch {
             try {
+                // Dapatkan user ID saat ini
+                val userId = firebaseService.getCurrentUserId()
+                if (userId == null) {
+                    updateUIForNoSession()
+                    return@launch
+                }
+
+                // Simpan user ID ke RoutineSessionManager
+                routineSessionManager.setUserId(userId)
+
                 val isSessionActive = routineSessionManager.isSessionStillActive()
                 Log.d("CheckAnxietyFragment", "Session active: $isSessionActive")
 
@@ -100,16 +168,16 @@ class CheckAnxietyFragment : Fragment() {
                     binding.tvDayAnxiety.visibility = View.VISIBLE
                     binding.tvDayAnxiety.text = "Hari $currentDay dari $totalDays"
 
+                    // Tampilkan tombol akhiri sesi
+                    binding.btnEndAnxietyRoutine.visibility = View.VISIBLE
+
                     if (hasCompletedToday) {
                         binding.btnCheckAnxietyRoutine.text = "Sudah Diisi Hari Ini"
                         binding.tvCheckAnxietyPeriodic.text = "Anda sudah mengisi form deteksi kecemasan hari ini"
                         binding.btnCheckAnxietyRoutine.isEnabled = false
-                        // Ubah warna button menjadi abu-abu
                         binding.btnCheckAnxietyRoutine.setBackgroundColor(
                             ContextCompat.getColor(requireContext(), R.color.gray400)
                         )
-
-                        // Opsional: Ubah warna teks juga agar lebih kontras
                         binding.btnCheckAnxietyRoutine.setTextColor(
                             ContextCompat.getColor(requireContext(), R.color.gray700)
                         )
@@ -117,37 +185,43 @@ class CheckAnxietyFragment : Fragment() {
                         binding.btnCheckAnxietyRoutine.text = "Lanjutkan Sesi"
                         binding.btnCheckAnxietyRoutine.isEnabled = true
                         binding.tvCheckAnxietyPeriodic.text = "Lanjutkan sesi deteksi kecemasan rutin Anda"
-                        // Kembalikan warna button ke normal
                         binding.btnCheckAnxietyRoutine.setBackgroundColor(
                             ContextCompat.getColor(requireContext(), R.color.bluePrimary)
                         )
-
-                        // Kembalikan warna teks ke normal
                         binding.btnCheckAnxietyRoutine.setTextColor(
                             ContextCompat.getColor(requireContext(), R.color.white)
                         )
                     }
                 } else {
-                    // Tidak ada sesi aktif, tampilkan UI default
-                    binding.tvTitle.text = "Deteksi Rutin"
-                    binding.tvDescAnxiety.text = "Anda belum memulai sesi Deteksi Rutin !"
-                    binding.tvDayAnxiety.visibility = View.GONE
-
-                    binding.btnCheckAnxietyRoutine.text = "Mulai Sesi"
-                    binding.btnCheckAnxietyRoutine.isEnabled = true
-                    binding.tvCheckAnxietyPeriodic.text = "Apakah anda ingin memulai sesi rutin untuk deteksi kecemasan anda?"
+                    updateUIForNoSession()
                 }
             } catch (e: Exception) {
                 Log.e("CheckAnxietyFragment", "Error checking routine session status", e)
-                // Tampilkan UI default jika terjadi error
-                binding.tvTitle.text = "Deteksi Rutin"
-                binding.tvDescAnxiety.text = "Terjadi kesalahan saat memeriksa status sesi"
-                binding.tvDayAnxiety.visibility = View.GONE
-                binding.btnCheckAnxietyRoutine.isEnabled = true
-                binding.btnCheckAnxietyRoutine.text = "Coba Lagi"
+                updateUIForNoSession()
             }
         }
     }
+
+    private fun updateUIForNoSession() {
+        binding.tvTitle.text = "Deteksi Rutin"
+        binding.tvDescAnxiety.text = "Anda belum memulai sesi Deteksi Rutin !"
+        binding.tvDayAnxiety.visibility = View.GONE
+
+        binding.btnCheckAnxietyRoutine.text = "Mulai Sesi"
+        binding.btnCheckAnxietyRoutine.isEnabled = true
+        binding.tvCheckAnxietyPeriodic.text = "Apakah anda ingin memulai sesi rutin untuk deteksi kecemasan anda?"
+        binding.btnCheckAnxietyRoutine.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.bluePrimary)
+        )
+        binding.btnCheckAnxietyRoutine.setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.white)
+        )
+
+        // Sembunyikan tombol akhiri sesi
+        binding.btnEndAnxietyRoutine.visibility = View.GONE
+    }
+
+
 
     companion object {
         @JvmStatic

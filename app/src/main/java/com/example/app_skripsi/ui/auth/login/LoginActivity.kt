@@ -17,6 +17,7 @@ import com.example.app_skripsi.MainActivity
 import com.example.app_skripsi.R
 import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.AppDatabase
+import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.data.local.SessionManager
 import com.example.app_skripsi.data.local.user.UserDao
 import com.example.app_skripsi.data.local.user.UserEntity
@@ -141,17 +142,45 @@ class LoginActivity : AppCompatActivity() {
         val expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)
 
         lifecycleScope.launch {
-            // Simpan session di SessionManager
-            val sessionManager = SessionManager(application)
-            sessionManager.saveSession(token, userId, expiresAt)
+            try {
+                // Simpan session di SessionManager
+                val sessionManager = SessionManager(application)
+                sessionManager.saveSession(token, userId, expiresAt)
 
-            // Pindah ke DashboardActivity dengan membawa data userId
-            val intent = Intent(this@LoginActivity, DashboardActivity::class.java).apply {
-                putExtra("USER_ID", userId)
+                // Pulihkan sesi deteksi rutin jika ada
+                val routineSessionManager = RoutineSessionManager(this@LoginActivity)
+                val firebaseService = FirebaseService()
+
+                // Simpan user ID di RoutineSessionManager
+                routineSessionManager.setUserId(userId)
+
+                // Coba pulihkan sesi dari Firebase
+                val restored = routineSessionManager.restoreSessionFromFirebase(firebaseService)
+
+                if (restored) {
+                    Log.d(TAG, "Berhasil memulihkan sesi deteksi rutin untuk user: $userId")
+                } else {
+                    Log.d(TAG, "Tidak ada sesi deteksi rutin aktif untuk dipulihkan")
+                }
+
+                // Pindah ke DashboardActivity dengan membawa data userId
+                val intent = Intent(this@LoginActivity, DashboardActivity::class.java).apply {
+                    putExtra("USER_ID", userId)
+                }
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error saat memulihkan sesi deteksi rutin: ${e.message}")
+
+                // Tetap navigasi ke Dashboard meskipun restore sesi gagal
+                val intent = Intent(this@LoginActivity, DashboardActivity::class.java).apply {
+                    putExtra("USER_ID", userId)
+                }
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
             }
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            finish()
         }
     }
 

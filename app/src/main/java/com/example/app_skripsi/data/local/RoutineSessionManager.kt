@@ -55,17 +55,111 @@ class RoutineSessionManager(private val context: Context) {
     val lastFormCompletionDate: Flow<String> = context.routineSessionDataStore.data
         .map { preferences -> preferences[LAST_FORM_COMPLETION_DATE] ?: "" }
 
-    // Method untuk menyimpan user ID saat ini
+    // Di kelas RoutineSessionManager, tambahkan fungsi berikut:
+
+    // Method untuk mengakhiri sesi deteksi rutin secara menyeluruh (lokal dan Firebase)
+    suspend fun endRoutineSession(firebaseService: FirebaseService): Boolean {
+        try {
+            // Dapatkan user ID yang tersimpan
+            val userId = getUserId() ?: firebaseService.getCurrentUserId()
+            if (userId == null) {
+                Log.e("RoutineSessionManager", "User ID tidak tersedia")
+                return false
+            }
+
+            Log.d("RoutineSessionManager", "Mengakhiri sesi untuk user: $userId")
+
+            // Cari deteksi rutin yang aktif di Firebase
+            val result = firebaseService.getActiveRoutineDetection(userId)
+
+            if (result.isSuccess) {
+                val activeRoutine = result.getOrNull()
+
+                if (activeRoutine != null) {
+                    // Update status di Firebase
+                    Log.d("RoutineSessionManager", "Menonaktifkan dokumen rutin: ${activeRoutine.first}")
+                    val updateResult = firebaseService.updateRoutineDetectionStatus(
+                        userId,
+                        activeRoutine.first,
+                        false
+                    )
+
+                    if (updateResult.isSuccess) {
+                        // Jika berhasil di Firebase, update juga DataStore
+                        endSession()
+                        Log.d("RoutineSessionManager", "Sesi rutin berhasil diakhiri")
+                        return true
+                    } else {
+                        Log.e("RoutineSessionManager", "Gagal mengupdate status rutin di Firebase: ${updateResult.exceptionOrNull()?.message}")
+                    }
+                } else {
+                    Log.d("RoutineSessionManager", "Tidak ada sesi rutin aktif di Firebase, hanya mengakhiri sesi lokal")
+                    // Tidak ada deteksi rutin aktif di Firebase, tetap akhiri sesi lokal
+                    endSession()
+                    return true
+                }
+            } else {
+                Log.e("RoutineSessionManager", "Error mengambil sesi rutin aktif: ${result.exceptionOrNull()?.message}")
+            }
+
+            return false
+        } catch (e: Exception) {
+            Log.e("RoutineSessionManager", "Error saat mengakhiri sesi rutin: ${e.message}")
+            return false
+        }
+    }
+
+    // Method untuk menyimpan user ID
     suspend fun setUserId(userId: String) {
         context.routineSessionDataStore.edit { preferences ->
             preferences[USER_ID] = userId
         }
+        Log.d("RoutineSessionManager", "User ID telah disimpan: $userId")
     }
 
     // Method untuk mendapatkan user ID tersimpan
     suspend fun getUserId(): String? {
         return context.routineSessionDataStore.data.first()[USER_ID]
     }
+
+    // Modifikasi startNewSession untuk menerima parameter userId
+    suspend fun startNewSession(sessionType: String, userId: String) {
+        val calendar = Calendar.getInstance()
+        val startDate = calendar.timeInMillis
+
+        // Menghitung tanggal akhir berdasarkan tipe sesi
+        val endDate = when(sessionType) {
+            "1_WEEK" -> {
+                calendar.add(Calendar.DAY_OF_YEAR, 7)
+                calendar.timeInMillis
+            }
+            "2_WEEKS" -> {
+                calendar.add(Calendar.DAY_OF_YEAR, 14)
+                calendar.timeInMillis
+            }
+            "1_MONTH" -> {
+                calendar.add(Calendar.MONTH, 1)
+                calendar.timeInMillis
+            }
+            else -> {
+                calendar.add(Calendar.DAY_OF_YEAR, 7) // Default 1 minggu
+                calendar.timeInMillis
+            }
+        }
+
+        context.routineSessionDataStore.edit { preferences ->
+            preferences[SESSION_ACTIVE] = true
+            preferences[SESSION_TYPE] = sessionType
+            preferences[SESSION_START_DATE] = startDate
+            preferences[SESSION_END_DATE] = endDate
+            preferences[LAST_FORM_COMPLETION_DATE] = "" // Reset tanggal terakhir pengisian
+            preferences[USER_ID] = userId // Simpan user ID
+        }
+
+        Log.d("RoutineSessionManager", "Sesi baru dimulai untuk user: $userId, tipe: $sessionType")
+    }
+
+
 
     // Method untuk validasi user
     suspend fun validateUser(currentUserId: String): Boolean {
@@ -119,42 +213,7 @@ class RoutineSessionManager(private val context: Context) {
         Log.d("RoutineSessionManager", "All routine session data cleared")
     }
 
-    // Modifikasi startNewSession untuk mencatat userId
-    suspend fun startNewSession(sessionType: String, userId: String) {
-        val calendar = Calendar.getInstance()
-        val startDate = calendar.timeInMillis
 
-        // Menghitung tanggal akhir berdasarkan tipe sesi
-        val endDate = when(sessionType) {
-            "1_WEEK" -> {
-                calendar.add(Calendar.DAY_OF_YEAR, 7)
-                calendar.timeInMillis
-            }
-            "2_WEEKS" -> {
-                calendar.add(Calendar.DAY_OF_YEAR, 14)
-                calendar.timeInMillis
-            }
-            "1_MONTH" -> {
-                calendar.add(Calendar.MONTH, 1)
-                calendar.timeInMillis
-            }
-            else -> {
-                calendar.add(Calendar.DAY_OF_YEAR, 7) // Default 1 minggu
-                calendar.timeInMillis
-            }
-        }
-
-        context.routineSessionDataStore.edit { preferences ->
-            preferences[SESSION_ACTIVE] = true
-            preferences[SESSION_TYPE] = sessionType
-            preferences[SESSION_START_DATE] = startDate
-            preferences[SESSION_END_DATE] = endDate
-            preferences[LAST_FORM_COMPLETION_DATE] = "" // Reset tanggal terakhir pengisian
-            preferences[USER_ID] = userId // Simpan user ID
-        }
-
-        Log.d("RoutineSessionManager", "New routine session started for user: $userId")
-    }
 
     // Method untuk pengecekan apakah hari ini adalah hari terakhir sesi
     suspend fun isTodayLastDayOfSession(): Boolean {
@@ -413,4 +472,64 @@ class RoutineSessionManager(private val context: Context) {
             return Pair(0, 0)
         }
     }
+
+    // Tambahkan di RoutineSessionManager.kt
+    suspend fun restoreSessionFromFirebase(firebaseService: FirebaseService): Boolean {
+        try {
+            // Ambil user ID saat ini
+            val userId = firebaseService.getCurrentUserId() ?: return false
+
+            // Simpan user ID ke DataStore
+            setUserId(userId)
+
+            // Cek apakah ada sesi aktif di Firebase
+            val result = firebaseService.getActiveRoutineDetection(userId)
+
+            if (result.isSuccess && result.getOrNull() != null) {
+                val activeRoutine = result.getOrNull()!!
+
+                // Ada sesi aktif, restore data ke DataStore
+                val sessionType = activeRoutine.second.periode
+                val startDate = activeRoutine.second.tanggalMulai.toDate().time
+                val endDate = activeRoutine.second.tanggalSelesai.toDate().time
+
+                // Hitung progress sesi (untuk completion date)
+                val dayEntries = activeRoutine.second.deteksiHarian
+
+                // Ambil tanggal sesi terbaru jika ada
+                val latestDateEntry = dayEntries.entries
+                    .maxByOrNull { it.key.toIntOrNull() ?: 0 }
+
+                val lastCompletionDate = if (latestDateEntry != null) {
+                    val latestDetection = latestDateEntry.value
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        .format(latestDetection.tanggal.toDate())
+                } else {
+                    ""
+                }
+
+                // Restore data ke DataStore
+                context.routineSessionDataStore.edit { preferences ->
+                    preferences[SESSION_ACTIVE] = true
+                    preferences[SESSION_TYPE] = sessionType
+                    preferences[SESSION_START_DATE] = startDate
+                    preferences[SESSION_END_DATE] = endDate
+                    preferences[LAST_FORM_COMPLETION_DATE] = lastCompletionDate
+                    preferences[USER_ID] = userId
+                }
+
+                Log.d("RoutineSessionManager", "Berhasil restore sesi dari Firebase: tipe=$sessionType, " +
+                        "hari ke-${dayEntries.size}, completion date=$lastCompletionDate")
+
+                return true
+            } else {
+                Log.d("RoutineSessionManager", "Tidak ada sesi aktif di Firebase untuk dipulihkan")
+                return false
+            }
+        } catch (e: Exception) {
+            Log.e("RoutineSessionManager", "Error merestorasi sesi: ${e.message}")
+            return false
+        }
+    }
+
 }

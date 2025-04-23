@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.app_skripsi.R
 import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.AppDatabase
+import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.data.local.SessionManager
 import com.example.app_skripsi.data.local.user.UserEntity
 import com.example.app_skripsi.data.repository.UserRepository
@@ -33,6 +34,13 @@ class DashboardActivity : AppCompatActivity() {
     private val userRepository by lazy {
         val database = AppDatabase.getDatabase(application)
         UserRepository(FirebaseService(), database.userDao())
+    }
+    private val firebaseService by lazy {
+        FirebaseService()
+    }
+
+    private val routineSessionManager by lazy {
+        RoutineSessionManager(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +65,7 @@ class DashboardActivity : AppCompatActivity() {
                 if (!userId.isNullOrEmpty()) {
                     // Load user data
                     loadUserData(userId)
+                    syncRoutineSessionStatus(userId)
                 } else {
                     // Redirect to login if no user session is found
                     startActivity(Intent(this@DashboardActivity, LoginActivity::class.java))
@@ -95,6 +104,67 @@ class DashboardActivity : AppCompatActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private suspend fun syncRoutineSessionStatus(userId: String) {
+        try {
+            // Set user ID di RoutineSessionManager
+            routineSessionManager.setUserId(userId)
+
+            // Cek status di DataStore
+            val isLocalSessionActive = routineSessionManager.isSessionActive.first()
+
+            // Cek status di Firebase
+            val result = firebaseService.getActiveRoutineDetection(userId)
+            val isFirebaseSessionActive = result.isSuccess && result.getOrNull() != null
+
+            Log.d("DashboardActivity", "Sinkronisasi sesi rutin - Local: $isLocalSessionActive, Firebase: $isFirebaseSessionActive")
+
+            if (isLocalSessionActive != isFirebaseSessionActive) {
+                if (isFirebaseSessionActive) {
+                    // Firebase aktif tapi lokal tidak, restore sesi
+                    val success = routineSessionManager.restoreSessionFromFirebase(firebaseService)
+                    Log.d("DashboardActivity", "Memulihkan sesi dari Firebase: $success")
+                } else if (isLocalSessionActive) {
+                    // Lokal aktif tapi Firebase tidak, akhiri sesi lokal
+                    routineSessionManager.endSession()
+                    Log.d("DashboardActivity", "Mengakhiri sesi lokal karena tidak ada sesi aktif di Firebase")
+                }
+            }
+
+            // Verifikasi hari terakhir sesi saat ini
+            if (isLocalSessionActive || isFirebaseSessionActive) {
+                checkLastDayOfSession(userId)
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error saat sinkronisasi sesi rutin: ${e.message}")
+        }
+    }
+
+    private suspend fun checkLastDayOfSession(userId: String) {
+        try {
+            // Cek apakah hari ini adalah hari terakhir sesi
+            val isLastDay = routineSessionManager.isTodayLastDayOfSession()
+            val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
+
+            if (isLastDay && hasCompletedToday) {
+                Log.d("DashboardActivity", "Hari terakhir sesi dan sudah diisi, akan mengakhiri sesi secara otomatis")
+
+                // Akhiri sesi di Firebase
+                val activeRoutineResult = firebaseService.getActiveRoutineDetection(userId)
+                if (activeRoutineResult.isSuccess && activeRoutineResult.getOrNull() != null) {
+                    val routineDoc = activeRoutineResult.getOrNull()!!
+                    firebaseService.updateRoutineDetectionStatus(userId, routineDoc.first, false)
+
+                    // Akhiri sesi lokal
+                    routineSessionManager.endSession()
+
+                    Log.d("DashboardActivity", "Sesi rutin berhasil diakhiri otomatis")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error saat memeriksa hari terakhir sesi: ${e.message}")
         }
     }
 

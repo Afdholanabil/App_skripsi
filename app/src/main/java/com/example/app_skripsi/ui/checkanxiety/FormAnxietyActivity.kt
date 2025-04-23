@@ -34,6 +34,7 @@ class FormAnxietyActivity : AppCompatActivity() {
     var detectionType: String = "QUICK" // Default ke deteksi singkat
 
     lateinit var viewModel: FormAnxietyViewModel
+    private lateinit var firebaseService: FirebaseService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,7 @@ class FormAnxietyActivity : AppCompatActivity() {
         // Inisialisasi formSessionManager dan routineSessionManager
         formSessionManager = FormSessionManager(this)
         routineSessionManager = RoutineSessionManager(this)
+        firebaseService = FirebaseService()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -513,12 +515,21 @@ class FormAnxietyActivity : AppCompatActivity() {
 
                 Log.d(TAG, "Selected session type: $selectedSessionType")
 
-                // Hanya set data lokal
                 lifecycleScope.launch {
                     try {
-                        // Simpan ke local storage
-                        routineSessionManager.startNewSession(selectedSessionType)
-                        Log.d(TAG, "Started local session of type: $selectedSessionType")
+                        // Ambil user ID saat ini
+                        val userId = firebaseService.getCurrentUserId()
+                        if (userId.isNullOrEmpty()) {
+                            Toast.makeText(this@FormAnxietyActivity,
+                                "Anda belum login",
+                                Toast.LENGTH_SHORT).show()
+                            finish()
+                            return@launch
+                        }
+
+                        // Simpan ke local storage dengan user ID
+                        routineSessionManager.startNewSession(selectedSessionType, userId)
+                        Log.d(TAG, "Started local session of type: $selectedSessionType for user: $userId")
 
                         // Lanjutkan setup form
                         formSessionManager.resetSession()

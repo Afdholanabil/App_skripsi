@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.SessionManager
 import com.example.app_skripsi.data.local.AppDatabase
+import com.example.app_skripsi.data.local.FormSessionManager
+import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.data.local.user.toUserModel
 import com.example.app_skripsi.data.repository.UserRepository
 import com.example.app_skripsi.databinding.FragmentProfileBinding
@@ -80,6 +82,7 @@ class ProfileFragment : Fragment() {
         binding.menuAbout.setOnClickListener {
             startActivity(Intent(requireContext(), AboutActivity::class.java))
         }
+        // Di dalam ProfileFragment.kt, perbarui bagian handleLogout/menuLogout:
         binding.menuLogout.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 val userId = sessionManager.sessionUserId.first()
@@ -87,7 +90,6 @@ class ProfileFragment : Fragment() {
                     android.util.Log.e("LogoutFlow", "❌ sessionUserId is NULL, cannot logout")
                     return@launch
                 }
-
 
                 // ✅ Check for data changes in SQLite before logging out
                 val localUser = userRepository.getUserFromLocal(userId)
@@ -109,6 +111,14 @@ class ProfileFragment : Fragment() {
                         android.util.Log.d("LogoutFlow", "🔹 No changes detected, skipping Firebase sync")
                     }
                 }
+
+                // Bersihkan data RoutineSessionManager
+                val routineSessionManager = RoutineSessionManager(requireContext())
+                routineSessionManager.clearAllData() // Pastikan method ini ada di RoutineSessionManager
+
+                // Bersihkan data FormSessionManager
+                val formSessionManager = FormSessionManager(requireContext())
+                formSessionManager.resetSession()
 
                 // ✅ Clear session & SQLite
                 sessionManager.clearSession()
