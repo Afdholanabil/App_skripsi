@@ -551,6 +551,35 @@ class FirebaseService(
         }
     }
 
+    /** 🔹 Menambahkan Dokumen ke Firestore (Bisa ID Manual atau Otomatis) */
+    suspend fun <T> addDocument(collection: String, documentId: String? = null, data: T): Result<Unit> {
+        return try {
+            val collectionRef = firestore.collection(collection)
+
+            if (documentId != null) {
+                // Jika ID manual diberikan
+                collectionRef.document(documentId).set(data!!).await()
+            } else {
+                // Jika ID otomatis
+                collectionRef.add(data!!).await()
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /** 🔹 Mengambil Dokumen Spesifik dengan ID */
+    suspend fun <T> getDocumentById(collection: String, documentId: String, clazz: Class<T>): Result<T?> {
+        return try {
+            val snapshot = firestore.collection(collection).document(documentId).get().await()
+            val data = snapshot.toObject(clazz)
+            Result.success(data)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
 
 //    /** 🔹 Mendapatkan Video Berdasarkan Kategori */
@@ -595,53 +624,5 @@ class FirebaseService(
 //        }
 //    }
 
-    /** 🔹 Menambahkan Dokumen ke Firestore (Bisa ID Manual atau Otomatis) */
-    suspend fun <T> addDocument(collection: String, documentId: String? = null, data: T): Result<Unit> {
-        return try {
-            val collectionRef = firestore.collection(collection)
 
-            if (documentId != null) {
-                // Jika ID manual diberikan
-                collectionRef.document(documentId).set(data!!).await()
-            } else {
-                // Jika ID otomatis
-                collectionRef.add(data!!).await()
-            }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    /** 🔹 Mengambil Semua Dokumen dari Koleksi Firestore */
-    suspend fun <T> getDocuments(collection: String, clazz: Class<T>): Result<List<T>> {
-        return try {
-            val snapshot = firestore.collection(collection).get().await()
-            val list = snapshot.documents.mapNotNull { it.toObject(clazz) }
-            Result.success(list)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    /** 🔹 Mengambil Dokumen Spesifik dengan ID */
-    suspend fun <T> getDocumentById(collection: String, documentId: String, clazz: Class<T>): Result<T?> {
-        return try {
-            val snapshot = firestore.collection(collection).document(documentId).get().await()
-            val data = snapshot.toObject(clazz)
-            Result.success(data)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    /** 🔹 Menghapus Dokumen di Firestore */
-    suspend fun deleteDocument(collection: String, documentId: String): Result<Unit> {
-        return try {
-            firestore.collection(collection).document(documentId).delete().await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 }

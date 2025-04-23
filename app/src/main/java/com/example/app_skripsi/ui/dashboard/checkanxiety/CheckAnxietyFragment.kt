@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.app_skripsi.R
+import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.databinding.FragmentCheckAnxietyBinding
 import com.example.app_skripsi.ui.checkanxiety.FormAnxietyActivity
@@ -21,6 +22,7 @@ class CheckAnxietyFragment : Fragment() {
     private var _binding: FragmentCheckAnxietyBinding? = null
     private val binding get() = _binding!!
     private lateinit var routineSessionManager: RoutineSessionManager
+    private lateinit var firebaseService: FirebaseService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,6 @@ class CheckAnxietyFragment : Fragment() {
             lifecycleScope.launch {
                 // Periksa sesi aktif dan status pengisian
                 val isSessionActive = routineSessionManager.isSessionStillActive()
-
                 if (isSessionActive) {
                     val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
 

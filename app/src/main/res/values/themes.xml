@@ -14,14 +14,12 @@
     </style>
 
 
-
     <style name="Widget.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
 
-<!--        <item name="android:backgroundTint">@color/black</item>-->
-<!--        <item name="cardForegroundColor">@color/black</item>-->
+        <!--        <item name="android:backgroundTint">@color/black</item>-->
+        <!--        <item name="cardForegroundColor">@color/black</item>-->
         <item name="android:background">@color/bottomNavBG</item>
     </style>
-
 
 
 </resources>

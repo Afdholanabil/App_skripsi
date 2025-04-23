@@ -13,14 +13,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.app_skripsi.R
 import com.example.app_skripsi.data.firebase.FirebaseService
-import com.example.app_skripsi.data.model.VideoModel
 import com.example.app_skripsi.data.repository.VideoRepository
-import com.example.app_skripsi.databinding.ActivityAboutBinding
 import com.example.app_skripsi.databinding.ActivityVideoListBinding
 import com.example.app_skripsi.ui.dashboard.home.VideoAdapter
 import com.example.app_skripsi.ui.detailvideo.DetailVideoActivity
 import com.example.app_skripsi.ui.detailvideo.VideoViewModelFactory
 import com.example.app_skripsi.ui.video.VideoViewModel
+import android.util.Log
 
 class VideoListActivity : AppCompatActivity() {
     private var _binding : ActivityVideoListBinding? = null
@@ -31,11 +30,13 @@ class VideoListActivity : AppCompatActivity() {
     private val viewModel: VideoViewModel by viewModels {
         VideoViewModelFactory(videoRepository)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         _binding = ActivityVideoListBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val bottomNav = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -43,9 +44,16 @@ class VideoListActivity : AppCompatActivity() {
                 systemBars.right + v.paddingRight , systemBars.bottom + v.paddingBottom)
             insets
         }
-//        / Hide status bar & navigation bar
+
+        // Hide status bar & navigation bar
         hideSystemUI()
+
+        // Setup RecyclerView
         setupRecyclerView()
+
+        // PENTING: Panggil metode untuk mengobservasi perubahan data
+        observeViewModel()
+
         // Tentukan kategori dari intent jika ada, atau load semua video
         val category = intent.getStringExtra("VIDEO_CATEGORY")
         if (category != null) {
@@ -55,6 +63,7 @@ class VideoListActivity : AppCompatActivity() {
             binding.tvTitle.text = "Semua Video"
             viewModel.loadAllVideos()
         }
+
         binding.btnBack.setOnClickListener { finish() }
     }
 
@@ -70,21 +79,37 @@ class VideoListActivity : AppCompatActivity() {
 
         // Observe videos data
         viewModel.videos.observe(this) { videos ->
-            val videoAdapter = VideoAdapter(videos) { video ->
-                val intent = Intent(this, DetailVideoActivity::class.java)
-                intent.putExtra("VIDEO_MODEL", video)
-                startActivity(intent)
-            }
-            binding.recyclerViewVideo.adapter = videoAdapter
+            Log.d("VideoListActivity", "Received ${videos.size} videos from ViewModel")
 
-//            // Show empty state if needed
-//            binding.emptyState.visibility = if (videos.isEmpty()) View.VISIBLE else View.GONE
+            if (videos.isNotEmpty()) {
+                val videoAdapter = VideoAdapter(videos) { video ->
+                    val intent = Intent(this, DetailVideoActivity::class.java)
+                    intent.putExtra("VIDEO_MODEL", video)
+                    startActivity(intent)
+                }
+                binding.recyclerViewVideo.adapter = videoAdapter
+            } else {
+                // Tampilkan pesan tidak ada video
+                Toast.makeText(this, "Tidak ada video tersedia", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Observe error state
         viewModel.error.observe(this) { errorMessage ->
             errorMessage?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                Log.e("VideoListActivity", "Error loading videos: $it")
+
+                // Tampilkan pesan error khusus untuk masalah izin
+                if (it.contains("PERMISSION_DENIED")) {
+                    Toast.makeText(
+                        this,
+                        "Tidak dapat mengakses data video. Silakan cek aturan keamanan Firestore.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(this, "Gagal memuat video: $it", Toast.LENGTH_SHORT).show()
+                }
+
                 viewModel.clearError()
             }
         }
@@ -101,6 +126,4 @@ class VideoListActivity : AppCompatActivity() {
         super.onDestroy()
         _binding = null
     }
-
-
 }

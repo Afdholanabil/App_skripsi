@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    android:layout_marginBottom="8dp"
+    app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Date -->
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hari: Senin, 7 April 2024"
+                android:fontFamily="@font/inter_bold"
+                android:textSize="16sp"/>
+
+            <!-- Emotion -->
+            <TextView
+                android:id="@+id/tvEmotion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Emosi: Senang"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="14sp"/>
+
+            <!-- Activity -->
+            <TextView
+                android:id="@+id/tvActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kegiatan: Olahraga"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="14sp"/>
+
+            <!-- GAD Scores -->
+            <LinearLayout
+                android:id="@+id/layoutGADScores"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GAD-1: Beberapa Hari"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textSize="14sp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GAD-2: Beberapa Hari"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textSize="14sp"/>
+                <!-- Add more GAD scores as needed -->
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tvskorGAD"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Skor GAD 7 :0"
+                android:layout_marginTop="4dp"
+                android:textAlignment="center"
+                android:fontFamily="@font/inter_bold"
+                android:textSize="16sp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
