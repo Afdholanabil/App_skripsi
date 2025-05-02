@@ -23,6 +23,7 @@ import com.example.app_skripsi.ui.profile.diary.DiaryActivity
 import com.example.app_skripsi.ui.profile.faq.FaqActivity
 import com.example.app_skripsi.ui.profile.RiwayatCheckActivity
 import com.example.app_skripsi.ui.profile.VideoListActivity
+import com.example.app_skripsi.utils.NotificationSchedulerManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -111,6 +112,11 @@ class ProfileFragment : Fragment() {
                         android.util.Log.d("LogoutFlow", "🔹 No changes detected, skipping Firebase sync")
                     }
                 }
+
+                // Cancel semua notifikasi saat logout
+                val notificationManager = NotificationSchedulerManager(requireContext())
+                notificationManager.cancelRoutineFormAlarms()
+                notificationManager.cancelAlarmNotifications()
 
                 // Bersihkan data RoutineSessionManager
                 val routineSessionManager = RoutineSessionManager(requireContext())

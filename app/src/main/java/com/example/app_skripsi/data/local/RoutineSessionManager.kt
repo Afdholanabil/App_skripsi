@@ -362,7 +362,29 @@ class RoutineSessionManager(private val context: Context) {
 
         // Jika tanggal saat ini melebihi tanggal akhir, sesi berakhir
         if (currentTime > endDate) {
-            endSession()
+            try {
+                // Akhiri sesi di DataStore
+                endSession()
+
+                // Dapatkan userId
+                val userId = getUserId()
+
+                // Jika userId tersedia, update juga di Firebase
+                if (userId != null) {
+                    // Ini perlu ditambahkan di method ini atau di class yang menggunakannya
+                    val firebaseService = FirebaseService()
+                    val result = firebaseService.getActiveRoutineDetection(userId)
+
+                    if (result.isSuccess && result.getOrNull() != null) {
+                        val activeRoutine = result.getOrNull()!!
+                        firebaseService.updateRoutineDetectionStatus(userId, activeRoutine.first, false)
+                        Log.d("RoutineSessionManager", "Routine session ended in Firestore due to end date")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("RoutineSessionManager", "Error ending session in Firestore: ${e.message}")
+            }
+
             return false
         }
         return true

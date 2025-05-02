@@ -192,6 +192,8 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun hideSystemUI() {
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.systemBars())

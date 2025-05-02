@@ -15,6 +15,8 @@ import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.databinding.FragmentCheckAnxietyBinding
 import com.example.app_skripsi.ui.checkanxiety.FormAnxietyActivity
+import com.example.app_skripsi.ui.checkanxiety.RoutineResultActivity
+import com.example.app_skripsi.utils.NotificationSchedulerManager
 import com.example.app_skripsi.utils.ToastUtils
 import kotlinx.coroutines.launch
 
@@ -54,6 +56,11 @@ class CheckAnxietyFragment : Fragment() {
             showEndSessionConfirmationDialog()
         }
 
+        binding.btnViewRoutineResults.setOnClickListener {
+            val intent = Intent(requireContext(),RoutineResultActivity::class.java)
+            startActivity(intent)
+        }
+
         // Cek status sesi rutin setiap kali fragment muncul
         checkRoutineSessionStatus()
     }
@@ -73,6 +80,9 @@ class CheckAnxietyFragment : Fragment() {
                         val success = routineSessionManager.endRoutineSession(firebaseService)
 
                         if (success) {
+                            // Cancel reminders
+                            val notificationManager = NotificationSchedulerManager(requireContext())
+                            notificationManager.cancelRoutineFormAlarms()
                             Toast.makeText(requireContext(),
                                 "Sesi deteksi rutin berhasil diakhiri",
                                 Toast.LENGTH_SHORT).show()
@@ -171,6 +181,9 @@ class CheckAnxietyFragment : Fragment() {
                     // Tampilkan tombol akhiri sesi
                     binding.btnEndAnxietyRoutine.visibility = View.VISIBLE
 
+                    // Sembunyikan tombol lihat hasil sesi
+                    binding.btnViewRoutineResults.visibility = View.GONE
+
                     if (hasCompletedToday) {
                         binding.btnCheckAnxietyRoutine.text = "Sudah Diisi Hari Ini"
                         binding.tvCheckAnxietyPeriodic.text = "Anda sudah mengisi form deteksi kecemasan hari ini"
@@ -192,6 +205,17 @@ class CheckAnxietyFragment : Fragment() {
                             ContextCompat.getColor(requireContext(), R.color.white)
                         )
                     }
+
+                    if (currentDay >= totalDays && hasCompletedToday) {
+                        // Hari terakhir dan sudah diisi, akhiri sesi
+                        Log.d("CheckAnxietyFragment", "Last day completed, ending session automatically")
+                        routineSessionManager.endRoutineSession(firebaseService)
+
+                        // Refresh UI untuk menampilkan status baru
+                        checkRoutineSessionStatus()
+                        return@launch
+                    }
+
                 } else {
                     updateUIForNoSession()
                 }
@@ -219,6 +243,9 @@ class CheckAnxietyFragment : Fragment() {
 
         // Sembunyikan tombol akhiri sesi
         binding.btnEndAnxietyRoutine.visibility = View.GONE
+
+        // Tampilkan tombol lihat hasil sesi
+        binding.btnViewRoutineResults.visibility = View.VISIBLE
     }
 
 

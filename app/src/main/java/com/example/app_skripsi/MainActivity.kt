@@ -27,6 +27,8 @@ import android.content.pm.PackageManager
 import android.util.Log
 
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.app_skripsi.data.local.RoutineSessionManager
+import com.example.app_skripsi.utils.NotificationSchedulerManager
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,6 +43,23 @@ class MainActivity : AppCompatActivity() {
         UserRepository(FirebaseService(), database.userDao())
     }
 
+    private lateinit var routineSessionManager: RoutineSessionManager
+    private lateinit var notificationManager: NotificationSchedulerManager
+
+    // Permission request launcher harus dideklarasikan sebagai variable
+    private val permissionRequestLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                // Izin diberikan, lanjutkan aplikasi
+                Log.d("MainActivity", "Izin notifikasi diberikan")
+                startAppLogic()
+            } else {
+                // Izin ditolak, beri tahu pengguna tetapi tetap lanjutkan aplikasi
+                Log.d("MainActivity", "Izin notifikasi ditolak")
+                startAppLogic() // Tetap lanjutkan aplikasi meskipun izin ditolak
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -52,11 +71,24 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         sessionManager = SessionManager(this)
+        // Initialize session manager and notification scheduler
+        routineSessionManager = RoutineSessionManager(this)
+        notificationManager = NotificationSchedulerManager(this)
 
         // Periksa izin notifikasi hanya jika SDK >= 33 (Android 13)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission()
+        } else{
+            startAppLogic()
         }
+
+
+        // Check if we need to start routine form reminders
+        checkAndScheduleRoutineReminders()
+
+        // Handle deep links from notifications if needed
+        handleNotificationIntent(intent.extras)
+
 
     }
 
@@ -77,39 +109,92 @@ class MainActivity : AppCompatActivity() {
 
     // Fungsi untuk meminta izin notifikasi
     private fun requestNotificationPermission() {
-        val permissionRequestLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    // Izin diberikan, lanjutkan aplikasi
-                    Log.d("MainActivity", "Izin notifikasi diberikan")
-                    startAppLogic()
-                } else {
-                    // Izin ditolak, beri tahu pengguna
-                    Log.d("MainActivity", "Izin notifikasi ditolak")
-                    // Misalnya, tampilkan Snackbar atau Toast untuk memberitahukan pengguna
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionRequestLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            startAppLogic()
+        }
+    }
+
+    /**
+     * Checks if routine session is active and schedules form reminders if needed
+     */
+    private fun checkAndScheduleRoutineReminders() {
+        lifecycleScope.launch {
+            try {
+                // Dapatkan user ID saat ini
+                val userId = sessionManager.sessionUserId.first()
+                if (userId.isNullOrEmpty()) {
+                    Log.d("MainActivity", "No user logged in, skipping routine reminders")
+                    return@launch
                 }
+
+                // Restore session dari Firebase jika ada
+                val isSessionRestored = routineSessionManager.restoreSessionFromFirebase(FirebaseService())
+
+                if (isSessionRestored || routineSessionManager.isSessionStillActive()) {
+                    Log.d("MainActivity", "Active routine session found for user: $userId, scheduling reminders")
+
+                    // Ubah ke AlarmManager untuk routine reminders
+                    notificationManager.scheduleRoutineFormRemindersWithAlarm(userId)
+                } else {
+                    Log.d("MainActivity", "No active routine session, cancelling reminders")
+                    notificationManager.cancelRoutineFormAlarms()
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error checking routine session", e)
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        // Handle intent dari notifikasi
+        handleNotificationIntent(intent.extras)
+    }
+
+    private fun handleNotificationIntent(extras: Bundle?) {
+        if (extras == null) return
+
+        val openForm = extras.getBoolean("OPEN_FORM", false)
+        val detectionType = extras.getString("DETECTION_TYPE", null)
+
+        if (openForm && detectionType == "ROUTINE") {
+            Log.d("MainActivity", "Opening routine form from notification")
+
+            // Buat intent untuk membuka DashboardActivity dengan flag
+            val dashboardIntent = Intent(this, DashboardActivity::class.java).apply {
+                putExtra("NAVIGATE_TO", "CHECK_ANXIETY")
+                putExtra("DETECTION_TYPE", "ROUTINE")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 
-        permissionRequestLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            startActivity(dashboardIntent)
+        }
     }
 
 
     private fun startAppLogic() {
         lifecycleScope.launch {
             delay(500)
-
-
-
             binding.tvNamaApp.alpha = 0f
             binding.tvNamaApp.animate().setDuration(3000).alpha(1f).withEndAction {
                 lifecycleScope.launch {
                     delay(500)
+
                     sessionManager.sessionUserId.collect { userId ->
                         if (!userId.isNullOrEmpty()) {
-                            android.util.Log.d("MainActivity", "📦 User Loaded from Session: $userId")
+                            Log.d("MainActivity", "📦 User Loaded from Session: $userId")
+                            // Setelah login, check dan schedule reminders
+                            checkAndScheduleRoutineReminders()
+
+                            // Handle intent dari notifikasi jika ada
+                            handleNotificationIntent(intent.extras)
                             startActivity(Intent(this@MainActivity, DashboardActivity::class.java))
                         } else {
-                            android.util.Log.e("MainActivity", "❌ User ID Not Found, Redirecting to Login")
+                            Log.e("MainActivity", "❌ User ID Not Found, Redirecting to Login")
                             startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                         }
                         finish()

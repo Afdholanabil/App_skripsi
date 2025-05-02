@@ -22,6 +22,7 @@ import com.example.app_skripsi.data.firebase.FirebaseService
 import com.example.app_skripsi.data.local.FormSessionManager
 import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.data.repository.AnxietyRepository
+import com.example.app_skripsi.utils.NotificationSchedulerManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -530,6 +531,10 @@ class FormAnxietyActivity : AppCompatActivity() {
                         // Simpan ke local storage dengan user ID
                         routineSessionManager.startNewSession(selectedSessionType, userId)
                         Log.d(TAG, "Started local session of type: $selectedSessionType for user: $userId")
+
+                        // Schedule reminders dengan AlarmManager
+                        val notificationManager = NotificationSchedulerManager(this@FormAnxietyActivity)
+                        notificationManager.scheduleRoutineFormRemindersWithAlarm(userId)
 
                         // Lanjutkan setup form
                         formSessionManager.resetSession()

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/tv_tanggal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hari -1 | Sabtu, 26-04-2025"
+        android:textSize="16sp"
+        android:fontFamily="@font/inter_medium"
+        android:textColor="@color/gray600"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/iv_see_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/llHarian"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tv_tanggal">
+
+        <!-- Emotion -->
+        <TextView
+            android:id="@+id/tvEmotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emosi: Senang"
+            android:fontFamily="@font/inter_semi_bold"
+            android:textSize="14sp" />
+
+        <!-- Activity -->
+        <TextView
+            android:id="@+id/tvActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kegiatan: Olahraga"
+            android:fontFamily="@font/inter_semi_bold"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"/>
+
+        <!-- GAD Scores -->
+        <LinearLayout
+            android:id="@+id/layoutGADScores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GAD-1: Beberapa Hari"
+                android:fontFamily="@font/inter_light"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GAD-2: Beberapa Hari"
+                android:fontFamily="@font/inter_light"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+            <!-- Add more GAD scores as needed -->
+        </LinearLayout>
+
+        <!-- Total Score -->
+        <TextView
+            android:id="@+id/tvTotalSkor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Skor GAD 7 : 18"
+            android:fontFamily="@font/inter_bold"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

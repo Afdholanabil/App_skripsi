@@ -66,6 +66,7 @@ dependencies {
     ksp(libs.androidx.room.compiler) // Pastikan compiler ada
     implementation (libs.androidx.room.ktx) // Coroutine Support
     implementation (libs.androidx.work.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Media3 (ExoPlayer)
     implementation(libs.androidx.media3.exoplayer)
@@ -75,4 +76,9 @@ dependencies {
     // Untuk mengambil gambar thumbnail
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+
+    implementation (libs.gson)
+
+//    implementation (libs.mpandroidchart)
+
 }

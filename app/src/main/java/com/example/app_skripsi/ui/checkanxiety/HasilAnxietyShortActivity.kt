@@ -21,6 +21,7 @@ import com.example.app_skripsi.data.model.DailyDetectionData
 import com.example.app_skripsi.data.model.RoutineDetectionModel
 import com.example.app_skripsi.data.repository.AnxietyRepository
 import com.example.app_skripsi.databinding.ActivityHasilAnxietyShortBinding
+import com.example.app_skripsi.utils.NotificationSchedulerManager
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -221,8 +222,58 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
                     }
                 } else {
                     // Update dokumen yang sudah ada untuk hari saat ini
-                    // Implementasi update untuk hari selain hari pertama
-                    // (kode dipertahankan untuk fungsi update jika diperlukan)
+                    val isSessionActive = routineSessionManager.isSessionStillActive()
+                    if (isSessionActive) {
+                        // Ambil dokumen aktif dari repository
+                        val activeRoutineResult = anxietyRepository.getActiveRoutineDetection()
+                        if (activeRoutineResult.isSuccess) {
+                            val activeRoutine = activeRoutineResult.getOrNull()
+                            if (activeRoutine != null) {
+                                // Tambahkan data untuk hari ini ke dokumen yang sudah ada
+                                val result = anxietyRepository.addDailyDataToExistingRoutine(
+                                    activeRoutine.first,
+                                    emotion,
+                                    activity,
+                                    gadAnswers,
+                                    totalScore,
+                                    routineSessionManager
+                                )
+
+                                if (result.isSuccess) {
+                                    Log.d(TAG, "Successfully added day $currentDay data to existing routine")
+                                    // Setelah berhasil menyimpan data hari ini // Cek apakah ini adalah hari terakhir dan semua data sudah lengkap
+                                    val totalDays = routineSessionManager.getSessionDurationInDays()
+                                    val currentDay = routineSessionManager.getCurrentSessionDay()
+
+                                    if (currentDay >= totalDays) {
+                                        // Ini hari terakhir, akhiri sesi
+                                        val userId = firebaseService.getCurrentUserId()
+                                        val activeRoutineResult = anxietyRepository.getActiveRoutineDetection()
+
+                                        if (activeRoutineResult.isSuccess && activeRoutineResult.getOrNull() != null) {
+                                            val activeRoutine = activeRoutineResult.getOrNull()!!
+
+                                            // Cancel reminders setelah sesi selesai
+                                            val notificationManager = NotificationSchedulerManager(this)
+                                            notificationManager.cancelRoutineFormAlarms()
+
+                                            Log.d(TAG, "Routine session completed and reminders cancelled")
+
+                                            // Update status di Firestore
+                                            firebaseService.updateRoutineDetectionStatus(userId!!, activeRoutine.first, false)
+
+                                            // Update local storage
+                                            routineSessionManager.endSession()
+
+                                            Log.d(TAG, "Routine session completed and ended automatically")
+                                        }
+                                    }
+                                } else {
+                                    Log.e(TAG, "Failed to add day data: ${result.exceptionOrNull()?.message}")
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Tandai sebagai telah mengisi form hari ini
@@ -260,7 +311,7 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
         return when {
             totalScore in 0..4 -> "Minimal"
             totalScore in 5..9 -> "Ringan"
-            totalScore in 10..14 -> "Sedang"
+            totalScore in 10..14 -> "Moderate"
             totalScore >= 15 -> "Parah"
             else -> "Tidak diketahui"
         }
@@ -353,6 +404,7 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
         return when (score) {
             0 -> "Tidak Pernah"
             1 -> "Beberapa Hari"
+
             2 -> "Lebih dari Setengah Hari"
             3 -> "Hampir Setiap Hari"
             else -> "Tidak Diketahui"
