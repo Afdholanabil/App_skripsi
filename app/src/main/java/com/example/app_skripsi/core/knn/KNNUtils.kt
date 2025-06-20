@@ -25,10 +25,7 @@ object KNNUtils {
 
             val data = Gson().fromJson<List<DataPoint>>(json, type)
             Log.d(TAG, "Successfully loaded ${data.size} training data points")
-
-            // Validate and log summary of training data
             logTrainingDataSummary(data)
-
             return data
         } catch (e: IOException) {
             Log.e(TAG, "Error loading training data: ${e.message}", e)

@@ -70,7 +70,7 @@
                 android:layout_height="50dp"
                 android:contentDescription="Happy"
                 android:src="@drawable/ic_happy"
-                app:tint="@color/bluePrimary" />
+                app:tint="@color/gray400" />
             <TextView
                 android:id="@+id/tvHappy"
                 android:layout_width="wrap_content"
@@ -206,7 +206,9 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusBottomEnd="16dp"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="24dp"
+        app:hintTextColor="@color/bluePrimary"
+        app:cursorColor="@color/bluePrimary">
 
         <AutoCompleteTextView
             android:id="@+id/actvActivityType"
@@ -234,9 +236,11 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusBottomEnd="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        app:hintTextColor="@color/bluePrimary"
+        app:cursorColor="@color/bluePrimary">
 
-        <com.example.app_skripsi.customview.CustomTextField
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -259,9 +263,11 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusBottomEnd="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        app:hintTextColor="@color/bluePrimary"
+        app:cursorColor="@color/bluePrimary">
 
-        <com.example.app_skripsi.customview.CustomTextField
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etContent"
             android:layout_width="match_parent"
             android:layout_height="120dp"
@@ -271,13 +277,17 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Tombol Simpan -->
-    <com.example.app_skripsi.customview.CustomButton
-        android:id="@+id/btnSaveDiary"
+    <Button
+        android:id="@+id/btnSimpanDiary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/buat_diary"
+        android:textSize="16sp"
+        android:fontFamily="@font/inter_semi_bold"
         android:enabled="true"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/gray100"
+        android:backgroundTint="@color/gray400"
+        android:paddingVertical="16dp"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">34.50.79.94</domain>
+    </domain-config>
+    <domain-config>
+        <domain includeSubdomains="true">ml-api-main-2yxfend4ya-et.a.run.app</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

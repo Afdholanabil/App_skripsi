@@ -27,6 +27,9 @@ import android.content.pm.PackageManager
 import android.util.Log
 
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.startup.AppInitializer
+import app.rive.runtime.kotlin.RiveInitializer
+import app.rive.runtime.kotlin.core.Rive
 import com.example.app_skripsi.data.local.RoutineSessionManager
 import com.example.app_skripsi.utils.NotificationSchedulerManager
 
@@ -62,7 +65,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+        AppInitializer.getInstance(applicationContext)
+            .initializeComponent(RiveInitializer::class.java)
+        Rive.init(this)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -82,13 +89,10 @@ class MainActivity : AppCompatActivity() {
             startAppLogic()
         }
 
-
         // Check if we need to start routine form reminders
         checkAndScheduleRoutineReminders()
-
         // Handle deep links from notifications if needed
         handleNotificationIntent(intent.extras)
-
 
     }
 
@@ -128,7 +132,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MainActivity", "No user logged in, skipping routine reminders")
                     return@launch
                 }
-
                 // Restore session dari Firebase jika ada
                 val isSessionRestored = routineSessionManager.restoreSessionFromFirebase(FirebaseService())
 
@@ -189,7 +192,6 @@ class MainActivity : AppCompatActivity() {
                             Log.d("MainActivity", "📦 User Loaded from Session: $userId")
                             // Setelah login, check dan schedule reminders
                             checkAndScheduleRoutineReminders()
-
                             // Handle intent dari notifikasi jika ada
                             handleNotificationIntent(intent.extras)
                             startActivity(Intent(this@MainActivity, DashboardActivity::class.java))
@@ -199,33 +201,12 @@ class MainActivity : AppCompatActivity() {
                         }
                         finish()
                     }
-//                sessionManager.sessionToken.collect { token ->
-//                    val expiresAt = sessionManager.sessionExpiresAt.first() ?: 0L
-//                    val userId = sessionManager.sessionUserId.first()
-//
-//                    android.util.Log.d("MainActivity", "🔑 Token Exists: ${token != null}")
-//                    android.util.Log.d("MainActivity", "🕒 Token Expiry: $expiresAt")
-//                    android.util.Log.d("MainActivity", "👤 User ID Exists: $userId")
-//
-//                    if (token != null && System.currentTimeMillis() < expiresAt) {
-//                        val localUser = userRepository.getUserFromLocal(userId ?: "")
-//                        if (localUser != null) {
-//                            android.util.Log.d("MainActivity", "📦 User Loaded from SQLite: $localUser")
-//                            startActivity(Intent(this@MainActivity, DashboardActivity::class.java))
-//                        } else {
-//                            android.util.Log.e("MainActivity", "⚠️ User not found in SQLite, fetching from Firebase")
-//                            startActivity(Intent(this@MainActivity, DashboardActivity::class.java))
-//                        }
-//                    } else {
-//                        android.util.Log.e("MainActivity", "❌ Token Expired or Missing, Redirecting to Login")
-//                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-//                    }
-//                    finish()
-//                }
                 }
 
 
             }
         }
     }
+
+
 }

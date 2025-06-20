@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class com.example.app_skripsi.data.model.UserModel {
-    public <init>();
-}
+#-keepclassmembers class com.example.app_skripsi.data.model.UserModel {
+#    public <init>();
+#}

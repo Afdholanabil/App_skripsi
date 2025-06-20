@@ -52,7 +52,7 @@
                android:id="@+id/cardStudyWork"
                android:layout_width="match_parent"
                android:layout_height="90dp"
-               app:cardBackgroundColor="@color/bluePrimary"
+               app:cardBackgroundColor="@color/gray200"
                app:layout_constraintTop_toBottomOf="@id/tvDesc"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintEnd_toEndOf="parent"
@@ -71,15 +71,15 @@
                        android:layout_width="60dp"
                        android:layout_height="60dp"
                        android:src="@drawable/ic_working"
-                       app:tint="@color/bluePrimary"
-                       android:background="@drawable/bg_icon_activity_form"/>
+                       app:tint="@color/gray200"
+                       android:background="@drawable/bg_icon_activity_form_inactive"/>
                    <TextView
                        android:id="@+id/tv_work"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
                        android:text="Belajar/Bekerja"
                        android:textSize="20sp"
-                       android:textColor="@color/gray200"
+                       android:textColor="@color/bluePrimary"
                        android:fontFamily="@font/inter_bold"
                        android:layout_marginStart="30dp"
                        />

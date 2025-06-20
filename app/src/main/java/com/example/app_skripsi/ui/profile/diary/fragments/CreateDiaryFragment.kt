@@ -108,7 +108,7 @@ class CreateDiaryFragment : Fragment() {
     }
 
     private fun setupSaveButton() {
-        binding.btnSaveDiary.setOnClickListener {
+        binding.btnSimpanDiary.setOnClickListener {
             val title = binding.etTitle.text.toString().trim()
             val content = binding.etContent.text.toString().trim()
             val activity = binding.actvActivityType.text.toString().trim()
@@ -152,7 +152,7 @@ class CreateDiaryFragment : Fragment() {
         val isAllFieldFilled = binding.actvActivityType.text.toString().isNotEmpty() && binding.etTitle.text.toString().isNotEmpty()
                 &&binding.etContent.text.toString().isNotEmpty()
 
-        binding.btnSaveDiary.isEnabled = isAllFieldFilled
+        binding.btnSimpanDiary.isEnabled = isAllFieldFilled
     }
 
     private fun setupTextWatchers() {

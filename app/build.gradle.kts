@@ -13,13 +13,23 @@ android {
 
     defaultConfig {
         applicationId = "com.example.app_skripsi"
-        minSdk = 31
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+//    sp   abi {
+//        isEnable = true
+//        reset()
+//        include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+//        isUniversalApk = true
+//    }
+//    density { isEnable = false }
+//}lits {
+
 
     buildTypes {
         release {
@@ -34,6 +44,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -78,6 +89,10 @@ dependencies {
     annotationProcessor(libs.compiler)
 
     implementation (libs.gson)
+
+    implementation (libs.rive.android)
+
+    implementation (libs.androidx.startup.runtime)
 
 //    implementation (libs.mpandroidchart)
 

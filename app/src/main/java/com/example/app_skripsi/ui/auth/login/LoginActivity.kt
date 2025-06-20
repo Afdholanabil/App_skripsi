@@ -51,6 +51,8 @@ class LoginActivity : AppCompatActivity() {
     private var email:String? = null
 
     private var backPresssedTime : Long= 0
+
+    private var btnState : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -69,12 +71,13 @@ class LoginActivity : AppCompatActivity() {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
-        binding.loginButton.setOnClickListener {
+        binding.loginBtn.setOnClickListener {
             email = binding.emailField.text.toString().trim()
             val password = binding.passwordField.text.toString().trim()
 
             if (email.isNullOrEmpty() || password.isEmpty()) {
                 ToastUtils.showToast(this, "Email dan Password harus diisi", position = ToastUtils.Position.TOP)
+
             } else {
                 viewModel.login(email!!, password)
             }
@@ -191,7 +194,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setButtonState() {
-        binding.loginButton.isEnabled = isAllFieldsFilled()
+        btnState = isAllFieldsFilled()
+        binding.loginBtn.isEnabled = btnState
+
+        if (btnState) {
+            binding.loginBtn.setBackgroundColor(
+                ContextCompat.getColor(this,R.color.bluePrimary)
+            )
+        } else {
+            binding.loginBtn.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.gray400)
+            )
+        }
     }
 
     private fun setupTextWatchers() {

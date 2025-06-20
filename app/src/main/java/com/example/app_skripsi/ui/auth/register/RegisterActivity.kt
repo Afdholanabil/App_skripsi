@@ -31,6 +31,7 @@ class RegisterActivity : AppCompatActivity() {
     private val viewModel: RegisterViewModel by viewModels {
         AuthViewModelFactory(AuthRepository(FirebaseService()))
     }
+    private var btnState : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -54,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             finish()
         }
-        binding.registerButton.setOnClickListener {
+        binding.registerBtn.setOnClickListener {
             val email = binding.emailField.text.toString().trim()
             val password = binding.passwordField.text.toString().trim()
             val confirmPassword = binding.confirmPasswordField.text.toString().trim()
@@ -131,6 +132,7 @@ class RegisterActivity : AppCompatActivity() {
 
         observeViewModel()
         setupTextWatchers()
+        setButtonState()
 
     }
 
@@ -149,18 +151,32 @@ class RegisterActivity : AppCompatActivity() {
         })
 
         viewModel.loading.observe(this, Observer { isLoading ->
-            binding.registerButton.isEnabled = !isLoading
+            binding.registerBtn.isEnabled = !isLoading
         })
     }
 
-    private fun setButtonState() {
-        val isAllFieldFilled = binding.emailField.text.toString().isNotEmpty() &&
+    private fun isAllFieldsFilled(): Boolean {
+        return binding.emailField.text.toString().isNotEmpty() &&
                 binding.passwordField.text.toString().isNotEmpty() &&
                 binding.confirmPasswordField.text.toString().isNotEmpty() && binding.nameField.text.toString().isNotEmpty() &&
                 binding.ageField.text.toString().isNotEmpty() && binding.actvGender.text.toString().isNotEmpty()
-
-        binding.registerButton.isEnabled = isAllFieldFilled
     }
+
+    private fun setButtonState() {
+        btnState = isAllFieldsFilled()
+        binding.registerBtn.isEnabled = btnState
+
+        if (btnState) {
+            binding.registerBtn.setBackgroundColor(
+                ContextCompat.getColor(this,R.color.bluePrimary)
+            )
+        } else {
+            binding.registerBtn.setBackgroundColor(
+                ContextCompat.getColor(this, R.color.gray400)
+            )
+        }
+    }
+
 
     private fun setupTextWatchers() {
         binding.emailField.addTextChangedListener { setButtonState() }
@@ -201,6 +217,8 @@ class RegisterActivity : AppCompatActivity() {
 //        showBackConfirmationDialog()
 //
 //    }
+
+
 
     override fun onDestroy() {
         super.onDestroy()

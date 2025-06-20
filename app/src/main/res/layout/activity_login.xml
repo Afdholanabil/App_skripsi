@@ -18,6 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"/>
 
+
     <!-- Title -->
     <TextView
         android:id="@+id/loginTitle"
@@ -69,7 +70,7 @@
         app:cursorColor="@color/bluePrimary"
         >
 
-        <com.example.app_skripsi.customview.CustomTextField
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/emailField"
             android:layout_width="match_parent"
             android:padding="20dp"
@@ -101,10 +102,10 @@
         app:endIconDrawable="@drawable/show"
         app:endIconContentDescription="Toggle password visibility">
 
-        <com.example.app_skripsi.customview.CustomTextField
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordField"
             android:layout_width="match_parent"
-            android:padding="16dp"
+            android:padding="20dp"
             android:hint="@string/password"
             android:layout_height="wrap_content"
             android:inputType="textPassword" />
@@ -125,18 +126,21 @@
         android:layout_marginTop="30dp" />
 
     <!-- Login Button -->
-        <com.example.app_skripsi.customview.CustomButton
-            android:id="@+id/loginButton"
+        <Button
+            android:id="@+id/loginBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/masuk"
-            android:enabled="true"
-            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:fontFamily="@font/inter_semi_bold"
+            android:enabled="false"
+            android:backgroundTint="@color/gray500"
+            android:textColor="@color/gray100"
+            android:paddingVertical="16dp"
             android:textAllCaps="false"
             app:layout_constraintTop_toBottomOf="@id/forgotPasswordLink"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-
             android:layout_marginTop="30dp"/>
 
     <!-- Sign Up Link -->
@@ -146,11 +150,23 @@
         android:layout_height="wrap_content"
         android:text="@string/daftarkan_diri_anda"
         android:textColor="@color/gray800"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:fontFamily="@font/inter_medium"
-        app:layout_constraintTop_toBottomOf="@id/loginButton"
+        app:layout_constraintTop_toBottomOf="@id/loginBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="30dp"
         android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/tvNamaApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HealOur : Anxiety"
+        android:fontFamily="@font/inter_light"
+        android:textColor="@color/gray400"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

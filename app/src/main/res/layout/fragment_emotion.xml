@@ -48,7 +48,7 @@
                 android:layout_height="50dp"
                 android:contentDescription="Happy"
                 android:src="@drawable/ic_happy"
-                app:tint="@color/bluePrimary" />
+                app:tint="@color/gray400" />
             <TextView
                 android:id="@+id/tvHappy"
                 android:layout_width="wrap_content"

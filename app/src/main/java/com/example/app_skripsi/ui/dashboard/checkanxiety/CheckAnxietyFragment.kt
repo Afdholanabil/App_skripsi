@@ -52,7 +52,7 @@ class CheckAnxietyFragment : Fragment() {
         }
 
         // Setup tombol akhiri sesi
-        binding.btnEndAnxietyRoutine.setOnClickListener {
+        binding.btnEndSessionRoutine.setOnClickListener {
             showEndSessionConfirmationDialog()
         }
 
@@ -179,7 +179,7 @@ class CheckAnxietyFragment : Fragment() {
                     binding.tvDayAnxiety.text = "Hari $currentDay dari $totalDays"
 
                     // Tampilkan tombol akhiri sesi
-                    binding.btnEndAnxietyRoutine.visibility = View.VISIBLE
+                    binding.btnEndSessionRoutine.visibility = View.VISIBLE
 
                     // Sembunyikan tombol lihat hasil sesi
                     binding.btnViewRoutineResults.visibility = View.GONE
@@ -242,7 +242,7 @@ class CheckAnxietyFragment : Fragment() {
         )
 
         // Sembunyikan tombol akhiri sesi
-        binding.btnEndAnxietyRoutine.visibility = View.GONE
+        binding.btnEndSessionRoutine.visibility = View.GONE
 
         // Tampilkan tombol lihat hasil sesi
         binding.btnViewRoutineResults.visibility = View.VISIBLE

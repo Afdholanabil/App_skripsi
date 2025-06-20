@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:padding="20dp"
     tools:context=".ui.auth.register.RegisterActivity">
+
     <ProgressBar
         android:id="@+id/progress_circular"
         android:layout_width="wrap_content"
@@ -77,7 +78,7 @@
                 app:boxCornerRadiusBottomStart="16dp"
                 app:boxCornerRadiusBottomEnd="16dp">
 
-                <com.example.app_skripsi.customview.CustomTextField
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
                 app:boxCornerRadiusBottomStart="16dp"
                 app:boxCornerRadiusBottomEnd="16dp">
 
-                <com.example.app_skripsi.customview.CustomTextField
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/emailField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -129,7 +130,7 @@
                 app:boxCornerRadiusBottomStart="16dp"
                 app:boxCornerRadiusBottomEnd="16dp">
 
-                <com.example.app_skripsi.customview.CustomTextField
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ageField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -187,7 +188,7 @@
                 app:endIconDrawable="@drawable/show"
                 app:endIconTint="@color/gray500">
 
-                <com.example.app_skripsi.customview.CustomTextField
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/passwordField"
                     android:layout_width="match_parent"
                     android:padding="16dp"
@@ -216,7 +217,7 @@
                 app:endIconDrawable="@drawable/show"
                 app:endIconTint="@color/gray500">
 
-                <com.example.app_skripsi.customview.CustomTextField
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/confirmPasswordField"
                     android:layout_width="match_parent"
                     android:padding="16dp"
@@ -225,18 +226,22 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Register Button -->
-                <com.example.app_skripsi.customview.CustomButton
-                android:id="@+id/registerButton"
+            <Button
+                android:id="@+id/registerBtn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Daftar"
-                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:fontFamily="@font/inter_semi_bold"
                 android:enabled="false"
+                android:backgroundTint="@color/gray500"
+                android:textColor="@color/gray100"
+                android:paddingVertical="16dp"
                 android:textAllCaps="false"
                 app:layout_constraintTop_toBottomOf="@id/tlConfirmPassword"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="30dp" />
+                android:layout_marginTop="30dp"/>
 
             <!-- Sign In Link -->
             <TextView
@@ -248,7 +253,7 @@
                 android:textSize="14sp"
                 android:fontFamily="@font/inter_medium"
                 android:textAlignment="center"
-                app:layout_constraintTop_toBottomOf="@id/registerButton"
+                app:layout_constraintTop_toBottomOf="@id/registerBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="20dp" />

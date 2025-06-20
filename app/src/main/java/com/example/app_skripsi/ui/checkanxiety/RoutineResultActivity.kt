@@ -84,9 +84,9 @@ class RoutineResultActivity : AppCompatActivity() {
         // Load data
         loadLatestCompletedRoutineDetection()
         // Tambahkan tombol test di UI
-        binding.btnTestNotification?.setOnClickListener {
-            testImmediateNotification()
-        }
+//        binding.btnTestNotification?.setOnClickListener {
+//            testImmediateNotification()
+//        }
 //        checkWorkStatus()
     }
 
