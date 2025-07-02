@@ -22,6 +22,7 @@ import com.example.app_skripsi.databinding.FragmentGadQuestionBinding
 import com.example.app_skripsi.ui.checkanxiety.FormAnxietyActivity
 import com.example.app_skripsi.ui.checkanxiety.FormAnxietyViewModel
 import com.example.app_skripsi.ui.checkanxiety.HasilAnxietyShortActivity
+import com.example.app_skripsi.ui.dashboard.DashboardActivity
 import com.example.app_skripsi.utils.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -94,28 +95,6 @@ class GadQuestionFragment : Fragment() {
         }
     }
 
-    private suspend fun validateAllAnswers(): Boolean {
-        try {
-            // Log semua jawaban dari DataStore untuk debugging
-            Log.d(TAG, "Validasi semua jawaban GAD:")
-            var allValid = true
-
-            for (i in 0..6) {
-                val answer = formSessionManager.getGadAnswer(i)
-                Log.d(TAG, "Jawaban GAD $i: $answer")
-                if (answer <= 0) {
-                    allValid = false
-                    Log.e(TAG, "Jawaban tidak valid untuk pertanyaan $i")
-                }
-            }
-
-            return allValid
-        } catch (e: Exception) {
-            Log.e(TAG, "Error validating answers", e)
-            return false
-        }
-    }
-
     private fun loadSavedAnswer() {
         lifecycleScope.launch {
             try {
@@ -184,7 +163,6 @@ class GadQuestionFragment : Fragment() {
             Log.d(TAG, "Menyimpan jawaban untuk pertanyaan $questionNumber: $answerToSave")
 
             if (isLastQuestion) {
-
                 // Double check: jika ini deteksi rutin, cek apakah sudah mengisi hari ini
                 val detectionType = formSessionManager.getDetectionType()
 
@@ -241,8 +219,10 @@ class GadQuestionFragment : Fragment() {
                     if (!hasAllAnswers) {
                         // Coba perbaiki jawaban yang hilang jika mungkin
                         Log.d(TAG, "Beberapa jawaban tidak lengkap, mencoba inisialisasi ulang dari pertanyaan awal")
-                        binding.tvErrorMessage.visibility = View.VISIBLE
-                        binding.tvErrorMessage.text = "Mohon jawab semua pertanyaan sebelumnya"
+                        if (binding.tvErrorMessage != null) {
+                            binding.tvErrorMessage.visibility = View.VISIBLE
+                            binding.tvErrorMessage.text = "Mohon jawab semua pertanyaan sebelumnya"
+                        }
 
                         // Tampilkan log sebagai bantuan debugging
                         for (i in 0..6) {
@@ -260,30 +240,69 @@ class GadQuestionFragment : Fragment() {
 
                         Log.d(TAG, "Data lengkap untuk hasil: Emosi=$emotion, Aktivitas=$activity, Total Skor=$totalScore")
 
-                        // Simpan data ke repository
-                        viewModel.saveAnxietyDetection(allAnswers, totalScore)
-                        // Tambahkan ini di akhir proses pengiriman data:
-                        if (detectionType == "ROUTINE") {
-                            try {
-                                val routineSessionManager = RoutineSessionManager(requireContext())
-                                // Tandai pengisian hari ini sebagai BACKUP jika ViewModel gagal melakukannya
-                                routineSessionManager.saveFormCompletionForToday()
-                                Log.d(TAG, "GadQuestion marking routine completion for today (backup)")
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Error saving completion status", e)
+                        // PERBAIKAN: Simpan data ke repository dan TUNGGU selesai
+                        val detectionType = formSessionManager.getDetectionType()
+
+                        if (detectionType == "QUICK") {
+                            // Untuk deteksi singkat, tunggu save selesai
+                            Log.d(TAG, "Saving quick detection to Firestore...")
+
+                            // Disable button sementara
+                            binding.btnLanjutkan.isEnabled = false
+                            binding.btnLanjutkan.text = "Menyimpan..."
+
+                            // Panggil ViewModel dan tunggu hasilnya
+                            val firebaseService = FirebaseService()
+                            val anxietyRepository = AnxietyRepository(firebaseService)
+
+                            // Simpan langsung ke repository
+                            val saveResult = anxietyRepository.addShortDetection(emotion, activity, allAnswers, totalScore)
+
+                            if (saveResult.isSuccess) {
+                                Log.d(TAG, "Quick detection saved successfully")
+
+                                // Navigasi ke hasil setelah save berhasil
+                                val intent = Intent(requireActivity(), HasilAnxietyShortActivity::class.java)
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                intent.putExtra("TOTAL_SCORE", totalScore)
+                                intent.putExtra("EMOTION", emotion)
+                                intent.putExtra("ACTIVITY", activity)
+                                intent.putIntegerArrayListExtra("GAD_ANSWERS", ArrayList(allAnswers))
+                                startActivity(intent)
+                                requireActivity().finish()
+
+                            } else {
+                                Log.e(TAG, "Failed to save quick detection: ${saveResult.exceptionOrNull()?.message}")
+                                Toast.makeText(requireContext(), "Gagal menyimpan data", Toast.LENGTH_LONG).show()
+
+                                // Enable button kembali
+                                binding.btnLanjutkan.isEnabled = true
+                                binding.btnLanjutkan.text = "Selesai"
                             }
+
+                        } else {
+                            // Untuk routine, gunakan ViewModel seperti biasa
+                            // Tambahkan backup marking untuk routine detection
+                            if (detectionType == "ROUTINE") {
+                                try {
+                                    val routineSessionManager = RoutineSessionManager(requireContext())
+                                    routineSessionManager.saveFormCompletionForToday()
+                                    Log.d(TAG, "GadQuestion marking routine completion for today (backup)")
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Error saving completion status", e)
+                                }
+                            }
+
+                            // Navigasi ke hasil langsung untuk routine
+                            val intent = Intent(requireActivity(), HasilAnxietyShortActivity::class.java)
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            intent.putExtra("TOTAL_SCORE", totalScore)
+                            intent.putExtra("EMOTION", emotion)
+                            intent.putExtra("ACTIVITY", activity)
+                            intent.putIntegerArrayListExtra("GAD_ANSWERS", ArrayList(allAnswers))
+                            startActivity(intent)
+                            requireActivity().finish()
                         }
-
-                        // Navigasi ke hasil dengan flag CLEAR_TOP untuk mencegah duplikasi
-                        val intent = Intent(requireActivity(), HasilAnxietyShortActivity::class.java)
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        intent.putExtra("TOTAL_SCORE", totalScore)
-                        intent.putExtra("EMOTION", emotion)
-                        intent.putExtra("ACTIVITY", activity)
-                        intent.putIntegerArrayListExtra("GAD_ANSWERS", ArrayList(allAnswers))
-                        startActivity(intent)
-                        requireActivity().finish()
-
                     }
                 }
             } else {
@@ -309,15 +328,28 @@ class GadQuestionFragment : Fragment() {
         }
     }
 
-    private fun calculateTotalScore(): Int {
-        // Konversi null menjadi 0 dan jumlahkan seluruh nilai
-        return gadAnswers.sumOf { it ?: 0 }
+    // TAMBAHAN: Observer sederhana yang hanya menunggu save selesai
+
+
+    // TAMBAHAN: Simple loading state
+    private fun showLoadingState(isLoading: Boolean) {
+        if (isLoading) {
+            binding.btnLanjutkan.isEnabled = false
+            binding.btnLanjutkan.text = "Menyimpan..."
+        } else {
+            binding.btnLanjutkan.isEnabled = true
+            binding.btnLanjutkan.text = if (isLastQuestion) "Selesai" else "Selanjutnya"
+        }
     }
 
+
+    // Override onDestroyView dengan logging tambahan
     override fun onDestroyView() {
         super.onDestroyView()
+
         _binding = null
         hasNavigated = false
+
     }
 
     companion object {

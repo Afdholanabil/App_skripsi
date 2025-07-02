@@ -24,7 +24,10 @@ class AnxietyRepository(private val firebaseService: FirebaseService) {
         gadAnswers: List<Int>,
         totalScore: Int
     ): Result<Unit> {
+        Log.d("AnxietyRepository", "addShortDetection called with: emotion=$emotion, activity=$activity, totalScore=$totalScore")
+
         val userId = firebaseService.getCurrentUserId() ?: return Result.failure(Exception("User not logged in"))
+        Log.d("AnxietyRepository", "User ID: $userId")
 
         try {
             // Mendapatkan hari dan tanggal saat ini
@@ -34,6 +37,8 @@ class AnxietyRepository(private val firebaseService: FirebaseService) {
 
             // Menentukan tingkat keparahan berdasarkan total skor
             val severity = getSeverityLevel(totalScore)
+
+            Log.d("AnxietyRepository", "Creating ShortDetectionModel with severity: $severity")
 
             // Membuat model data untuk deteksi singkat
             val shortDetection = ShortDetectionModel(
@@ -52,9 +57,19 @@ class AnxietyRepository(private val firebaseService: FirebaseService) {
                 severity = severity
             )
 
-            return firebaseService.addShortDetection(userId, shortDetection)
+            Log.d("AnxietyRepository", "Calling firebaseService.addShortDetection")
+            val result = firebaseService.addShortDetection(userId, shortDetection)
+
+            if (result.isSuccess) {
+                Log.d("AnxietyRepository", "Successfully saved short detection to Firestore")
+            } else {
+                Log.e("AnxietyRepository", "Failed to save to Firestore: ${result.exceptionOrNull()?.message}")
+            }
+
+            return result
 
         } catch (e: Exception) {
+            Log.e("AnxietyRepository", "Exception in addShortDetection: ${e.message}", e)
             return Result.failure(e)
         }
     }

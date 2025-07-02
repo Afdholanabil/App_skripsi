@@ -37,12 +37,28 @@ class FormAnxietyViewModel(
     private val _activeRoutineDetection = MutableLiveData<Pair<String, RoutineDetectionModel>?>()
     val activeRoutineDetection: LiveData<Pair<String, RoutineDetectionModel>?> get() = _activeRoutineDetection
 
-    private val _routineSessionInfo = MutableLiveData<Triple<String, Int, Int>>() // type, currentDay, totalDays
+    private val _routineSessionInfo =
+        MutableLiveData<Triple<String, Int, Int>>() // type, currentDay, totalDays
     val routineSessionInfo: LiveData<Triple<String, Int, Int>> get() = _routineSessionInfo
 
     // LiveData untuk menyimpan jawaban GAD untuk diteruskan ke activity hasil
     private val _gadAnswersList = MutableLiveData<ArrayList<Int>>()
     val gadAnswersList: LiveData<ArrayList<Int>> get() = _gadAnswersList
+
+    // Reset navigation state
+    fun resetNavigationState() {
+        _navigateToResult.value = false
+    }
+
+    // Reset error message
+    fun resetErrorMessage() {
+        _errorMessage.value = ""
+    }
+
+    // Reset loading state
+    fun resetLoadingState() {
+        _isLoading.value = false
+    }
 
     // Fungsi untuk mengatur emosi yang dipilih
     fun setSelectedEmotion(emotion: String) {
@@ -111,8 +127,10 @@ class FormAnxietyViewModel(
             val activeRoutine = _activeRoutineDetection.value ?: return@launch
 
             try {
-                val currentDayResult = anxietyRepository.getCurrentDayInRoutineSession(activeRoutine.first)
-                val durationResult = anxietyRepository.getRoutineSessionDuration(activeRoutine.first)
+                val currentDayResult =
+                    anxietyRepository.getCurrentDayInRoutineSession(activeRoutine.first)
+                val durationResult =
+                    anxietyRepository.getRoutineSessionDuration(activeRoutine.first)
 
                 if (currentDayResult.isSuccess && durationResult.isSuccess) {
                     val currentDay = currentDayResult.getOrNull() ?: 1
@@ -133,7 +151,8 @@ class FormAnxietyViewModel(
             val activeRoutine = _activeRoutineDetection.value ?: return@launch
 
             try {
-                val checkResult = anxietyRepository.hasCompletedRoutineDetectionToday(activeRoutine.first)
+                val checkResult =
+                    anxietyRepository.hasCompletedRoutineDetectionToday(activeRoutine.first)
                 if (checkResult.isSuccess) {
                     val hasCompleted = checkResult.getOrNull() ?: false
                     if (hasCompleted) {
@@ -155,7 +174,10 @@ class FormAnxietyViewModel(
                 val detectionType = formSessionManager.getDetectionType()
 
                 // Log untuk debugging
-                Log.d("FormAnxietyViewModel", "Saving ${detectionType} detection - Emotion: $emotion, Activity: $activity, Score: $totalScore")
+                Log.d(
+                    "FormAnxietyViewModel",
+                    "Saving ${detectionType} detection - Emotion: $emotion, Activity: $activity, Score: $totalScore"
+                )
                 Log.d("FormAnxietyViewModel", "GAD Answers: $gadAnswers")
 
                 // Simpan jawaban dan total skor ke DataStore untuk backup
@@ -164,77 +186,48 @@ class FormAnxietyViewModel(
                 }
                 formSessionManager.saveGadTotalScore(totalScore)
 
-                // Tidak perlu menyimpan data di sini, cukup tandai selesai untuk hari ini jika rutin
                 if (detectionType == "ROUTINE") {
+                    // Untuk deteksi rutin, tandai selesai untuk hari ini
                     routineSessionManager.saveFormCompletionForToday()
+                    Log.d("FormAnxietyViewModel", "Routine detection marked as completed for today")
                 } else {
-                    // Untuk deteksi singkat, tetap simpan data
-                    anxietyRepository.addShortDetection(emotion, activity, gadAnswers, totalScore)
+                    // PERBAIKAN: Untuk deteksi singkat, PASTIKAN simpan data ke Firestore
+                    Log.d("FormAnxietyViewModel", "Attempting to save short detection to Firestore")
+
+                    // LANGSUNG PANGGIL REPOSITORY TANPA TRY-CATCH BERLEBIHAN
+                    val result = anxietyRepository.addShortDetection(
+                        emotion,
+                        activity,
+                        gadAnswers,
+                        totalScore
+                    )
+
+                    if (result.isSuccess) {
+                        Log.d(
+                            "FormAnxietyViewModel",
+                            "Short detection saved successfully to Firestore"
+                        )
+                    } else {
+                        val error = result.exceptionOrNull()
+                        Log.e(
+                            "FormAnxietyViewModel",
+                            "Failed to save short detection: ${error?.message}",
+                            error
+                        )
+                        _errorMessage.value = "Gagal menyimpan deteksi singkat: ${error?.message}"
+                        return@launch // Don't set navigation flag if save failed
+                    }
                 }
 
-                // Navigasi ke hasil
+                // Set navigation flag hanya jika save berhasil (atau routine yang tidak perlu save)
                 _navigateToResult.value = true
+                Log.d("FormAnxietyViewModel", "Navigation flag set to true")
+
             } catch (e: Exception) {
-                Log.e("FormAnxietyViewModel", "Error saving detection: ${e.message}")
+                Log.e("FormAnxietyViewModel", "Error in saveAnxietyDetection: ${e.message}", e)
                 _errorMessage.value = "Gagal menyimpan deteksi: ${e.message}"
             } finally {
                 _isLoading.value = false
-            }
-        }
-    }
-
-    // Mendapatkan deteksi rutin aktif
-    fun getActiveRoutineSessionInfo(): Pair<String, Triple<Int, Int, String>>? {
-        val activeRoutine = _activeRoutineDetection.value ?: return null
-        val sessionInfo = _routineSessionInfo.value ?: return null
-
-        val sessionType = when(sessionInfo.first) {
-            "1_WEEK" -> "1 Minggu"
-            "2_WEEKS" -> "2 Minggu"
-            "1_MONTH" -> "1 Bulan"
-            else -> sessionInfo.first
-        }
-
-        return Pair(activeRoutine.first, Triple(sessionInfo.second, sessionInfo.third, sessionType))
-    }
-
-    // Validasi apakah semua jawaban GAD sudah diisi
-    fun validateGadAnswers(gadAnswers: List<Int?>): Boolean {
-        // Pastikan semua pertanyaan GAD telah dijawab
-        return gadAnswers.size == 7 && gadAnswers.all { it != null }
-    }
-
-    // Reset navigasi ke hasil
-    fun resetNavigationState() {
-        _navigateToResult.value = false
-    }
-
-    // Mengecek apakah user bisa melakukan deteksi rutin hari ini
-    fun canDoRoutineDetectionToday(): Boolean {
-        var canDo = false
-        viewModelScope.launch {
-            // Cek apakah ada sesi rutin aktif
-            val isSessionActive = routineSessionManager.isSessionStillActive()
-            if (!isSessionActive) return@launch
-
-            // Cek apakah sudah mengisi deteksi hari ini
-            val hasCompletedToday = routineSessionManager.hasCompletedFormToday()
-            canDo = !hasCompletedToday
-        }
-        return canDo
-    }
-
-    // Load data dari DataStore
-    fun loadSavedData() {
-        viewModelScope.launch {
-            val emotion = formSessionManager.emotion.first()
-            if (emotion.isNotEmpty()) {
-                _selectedEmotion.value = emotion
-            }
-
-            val activity = formSessionManager.activity.first()
-            if (activity.isNotEmpty()) {
-                _selectedActivity.value = activity
             }
         }
     }
@@ -260,43 +253,5 @@ class FormAnxietyViewModel(
             }
         }
     }
-
-    // Di FormAnxietyViewModel, pada saat menangani navigasi ke hasil
-    fun navigateToResultScreen() {
-        viewModelScope.launch {
-            val emotion = formSessionManager.emotion.first()
-            val activity = formSessionManager.activity.first()
-            val totalScore = formSessionManager.gadTotalScore.first()
-
-            // Dapatkan jawaban GAD
-            val gadAnswers = mutableListOf<Int>()
-            for (i in 0..6) {
-                val answer = formSessionManager.getGadAnswer(i)
-                if (answer > 0) {
-                    // Konversi dari skala 1-4 ke skala 0-3
-                    gadAnswers.add(answer - 1)
-                } else {
-                    gadAnswers.add(0) // Default 0 jika tidak ada jawaban
-                }
-            }
-
-            // Sediakan data untuk HasilAnxietyShortActivity
-//            _resultData.value = HasilAnxietyData(
-//                totalScore = totalScore,
-//                emotion = emotion,
-//                activity = activity,
-//                gadAnswers = gadAnswers
-//            )
-
-            _navigateToResult.value = true
-        }
-    }
-
-    // Data class untuk menampung data hasil
-    data class HasilAnxietyData(
-        val totalScore: Int,
-        val emotion: String,
-        val activity: String,
-        val gadAnswers: List<Int>
-    )
 }
+

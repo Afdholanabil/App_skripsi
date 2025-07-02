@@ -38,12 +38,6 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
     private lateinit var formSessionManager: FormSessionManager
     private lateinit var routineSessionManager: RoutineSessionManager
 
-    // Flag untuk mencegah pemrosesan ganda
-    companion object {
-        private val isProcessing = AtomicBoolean(false)
-        private const val TAG = "HasilAnxietyActivity"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -61,17 +55,8 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
         formSessionManager = FormSessionManager(this)
         routineSessionManager = RoutineSessionManager(this)
 
-        // Cek apakah proses sudah berjalan untuk mencegah duplikasi
-        if (isProcessing.compareAndSet(false, true)) {
-            try {
-                processAnxietyResults()
-            } finally {
-                // Pastikan flag selalu direset
-                isProcessing.set(false)
-            }
-        } else {
-            Log.d(TAG, "Proses sudah berjalan, mencegah pemrosesan ganda")
-        }
+        displayResults()
+
 
         // Back button
         binding.btnBack.setOnClickListener {
@@ -87,57 +72,71 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         Log.d(TAG, "onNewIntent dipanggil, mencegah pemrosesan ulang")
-        // Tidak perlu memproses ulang, cukup tampilkan UI
     }
 
-    private fun processAnxietyResults() {
-        // Ambil data dari intent
+    private fun displayResults() {
+
         val totalScore = intent.getIntExtra("TOTAL_SCORE", 0)
         val emotion = intent.getStringExtra("EMOTION") ?: "Tidak Diketahui"
         val activity = intent.getStringExtra("ACTIVITY") ?: "Tidak Diketahui"
         val gadAnswers = intent.getIntegerArrayListExtra("GAD_ANSWERS") ?: arrayListOf()
 
-        Log.d(TAG, "Data diterima - Score: $totalScore, Emotion: $emotion, Activity: $activity, GAD size: ${gadAnswers.size}")
+        Log.d(TAG, "Displaying results - Score: $totalScore, Emotion: $emotion, Activity: $activity, GAD size: ${gadAnswers.size}")
 
-        // Validasi data dan gunakan data dari session jika perlu
-        lifecycleScope.launch {
-            var finalScore = totalScore
-            var finalEmotion = emotion
-            var finalActivity = activity
-            var finalGadAnswers = gadAnswers
 
-            // Jika data intent tidak valid, gunakan data dari FormSessionManager
-            if (totalScore == 0 || emotion == "Tidak Diketahui" || activity == "Tidak Diketahui" || gadAnswers.isEmpty()) {
-                Log.d(TAG, "Data intent tidak valid, menggunakan data dari FormSessionManager")
+        if (totalScore == 0 || emotion == "Tidak Diketahui" || activity == "Tidak Diketahui" || gadAnswers.isEmpty()) {
+            Log.d(TAG, "Data intent tidak valid, menggunakan data dari FormSessionManager")
 
-                // Menggunakan gadTotalScore.first() untuk mendapatkan nilai dari Flow
-                finalScore = formSessionManager.gadTotalScore.first()
-                finalEmotion = formSessionManager.emotion.first()
-                finalActivity = formSessionManager.activity.first()
+            lifecycleScope.launch {
+                val finalScore = formSessionManager.gadTotalScore.first()
+                val finalEmotion = formSessionManager.emotion.first()
+                val finalActivity = formSessionManager.activity.first()
 
-                // Ambil jawaban GAD-7 dari formSessionManager
+
                 val retrievedAnswers = ArrayList<Int>()
                 for (i in 0..6) {
                     val answer = formSessionManager.getGadAnswer(i)
-                    // Konversi ke skala 0-3 jika nilai valid
+
                     if (answer > 0) {
                         retrievedAnswers.add(answer - 1)
                     } else {
-                        retrievedAnswers.add(0) // Default ke 0 jika tidak valid
+                        retrievedAnswers.add(0)
                     }
                 }
-                finalGadAnswers = retrievedAnswers
 
-                Log.d(TAG, "Data dari FormSessionManager - Score: $finalScore, Emotion: $finalEmotion, Activity: $finalActivity, GAD size: ${finalGadAnswers.size}")
+                Log.d(TAG, "Data dari FormSessionManager - Score: $finalScore, Emotion: $finalEmotion, Activity: $finalActivity, GAD size: ${retrievedAnswers.size}")
+
+                // Update UI dengan data yang sudah divalidasi
+                updateUI(finalScore, finalEmotion, finalActivity, retrievedAnswers)
+
+                // Hanya proses routine detection jika diperlukan
+                // Deteksi singkat sudah diproses di ViewModel
+                lifecycleScope.launch {
+                    val detectionType = formSessionManager.getDetectionType()
+                    if (detectionType == "ROUTINE") {
+                        processRoutineDetectionIfNeeded(finalScore, finalEmotion, finalActivity, retrievedAnswers)
+                    } else {
+                        Log.d(TAG, "Short detection already processed in ViewModel, skipping")
+                    }
+                }
             }
+        } else {
+            // Data dari intent valid, gunakan langsung
+            updateUI(totalScore, emotion, activity, gadAnswers)
 
-            // Set UI dengan data yang sudah divalidasi
-            updateUI(finalScore, finalEmotion, finalActivity, finalGadAnswers)
-
-            // Proses data untuk deteksi rutin jika perlu
-            processRoutineDetectionIfNeeded(finalScore, finalEmotion, finalActivity, finalGadAnswers)
+            // Hanya proses routine detection jika diperlukan
+            lifecycleScope.launch {
+                val detectionType = formSessionManager.getDetectionType()
+                if (detectionType == "ROUTINE") {
+                    processRoutineDetectionIfNeeded(totalScore, emotion, activity, gadAnswers)
+                } else {
+                    Log.d(TAG, "Short detection already processed in ViewModel, skipping")
+                }
+            }
         }
     }
+
+
 
     private suspend fun processRoutineDetectionIfNeeded(
         totalScore: Int,
@@ -414,5 +413,10 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+    // Flag untuk mencegah pemrosesan ganda
+    companion object {
+        private val isProcessing = AtomicBoolean(false)
+        private const val TAG = "HasilAnxietyShortActivity"
     }
 }
