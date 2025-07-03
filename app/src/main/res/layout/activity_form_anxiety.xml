@@ -37,7 +37,6 @@
         android:layout_marginStart="12dp"
         android:text="Deteksi"
         android:textSize="20sp"
-        android:textColor="@color/gray800"
         app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toEndOf="@id/btnBack"

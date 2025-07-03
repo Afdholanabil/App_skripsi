@@ -385,7 +385,6 @@ class HasilAnxietyShortActivity : AppCompatActivity() {
                 val textView = TextView(this).apply {
                     text = "GAD-${index + 1}: $question - ${getGadScoreDescription(gadAnswers[index])}"
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                    setTextColor(ContextCompat.getColor(this@HasilAnxietyShortActivity, R.color.gray800))
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
