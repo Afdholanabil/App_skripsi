@@ -41,6 +41,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -65,8 +66,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation (libs.androidx.datastore.preferences)
     implementation (libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler) // Pastikan compiler ada
-    implementation (libs.androidx.room.ktx) // Coroutine Support
+    ksp(libs.androidx.room.compiler)
+    implementation (libs.androidx.room.ktx)
     implementation (libs.androidx.work.runtime)
     implementation(libs.androidx.work.runtime.ktx)
 
@@ -84,7 +85,5 @@ dependencies {
     implementation (libs.rive.android)
 
     implementation (libs.androidx.startup.runtime)
-
-//    implementation (libs.mpandroidchart)
 
 }

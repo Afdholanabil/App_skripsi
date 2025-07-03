@@ -3,11 +3,14 @@ package com.healour.anxiety.ui.auth.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -75,6 +78,8 @@ class LoginActivity : AppCompatActivity() {
 
             } else {
                 viewModel.login(email!!, password)
+
+
             }
         }
 
@@ -105,9 +110,13 @@ class LoginActivity : AppCompatActivity() {
         observeViewModel()
         setupTextWatchers()
         setButtonState()
+        hideSystemUI()
     }
 
     private fun observeViewModel() {
+        viewModel.loading.observe(this ){ isLoading ->
+            showLoading(isLoading)
+        }
         viewModel.loginResult.observe(this, Observer { result ->
             if (result.isSuccess) {
                 val user = result.getOrNull()
@@ -131,6 +140,32 @@ class LoginActivity : AppCompatActivity() {
                 Log.e(TAG,"Login gagal: ${result.exceptionOrNull()?.message}")
             }
         })
+    }
+
+    private fun showLoading(isLoading : Boolean){
+        viewModel.loading.observe(this) { isLoading ->
+            if (isLoading) {
+                binding.progressCircular.visibility = View.VISIBLE
+                binding.loginBtn.isEnabled = false
+
+
+                binding.emailField.isEnabled = false
+                binding.passwordField.isEnabled = false
+                binding.signupLink.isEnabled = false
+                binding.forgotPasswordLink.isEnabled = false
+
+            } else {
+                binding.progressCircular.visibility = View.GONE
+
+                binding.emailField.isEnabled = true
+                binding.passwordField.isEnabled = true
+                binding.signupLink.isEnabled = true
+                binding.forgotPasswordLink.isEnabled = true
+
+                // Set button state sesuai validasi field
+                setButtonState()
+            }
+        }
     }
 
     private fun saveSessionAndNavigate(user: UserEntity) {
@@ -206,6 +241,13 @@ class LoginActivity : AppCompatActivity() {
     private fun setupTextWatchers() {
         binding.emailField.addTextChangedListener { setButtonState() }
         binding.passwordField.addTextChangedListener { setButtonState() }
+    }
+
+    private fun hideSystemUI() {
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     // Handle double back press untuk keluar aplikasi

@@ -26,6 +26,7 @@ import android.util.Log
 
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.BuildCompat
+import androidx.media3.ui.BuildConfig
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import app.rive.runtime.kotlin.core.Rive
@@ -90,6 +91,8 @@ class MainActivity : AppCompatActivity() {
         checkAndScheduleRoutineReminders()
         // Handle deep links from notifications if needed
         handleNotificationIntent(intent.extras)
+
+        binding.tvVersion.text = "HealOur: Anxiety ${com.healour.anxiety.BuildConfig.VERSION_NAME}"
     }
 
     // Fungsi untuk memeriksa izin

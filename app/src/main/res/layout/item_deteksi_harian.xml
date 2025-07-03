@@ -13,7 +13,7 @@
         android:text="Hari -1 | Sabtu, 26-04-2025"
         android:textSize="16sp"
         android:fontFamily="@font/inter_medium"
-        android:textColor="@color/gray600"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

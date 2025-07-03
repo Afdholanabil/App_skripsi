@@ -134,6 +134,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
+
         viewModel.registerResult.observe(this, Observer { result ->
             if (result.isSuccess) {
                 ToastUtils.showToast(this, "Registrasi berhasil, silakan login.", position = ToastUtils.Position.TOP)

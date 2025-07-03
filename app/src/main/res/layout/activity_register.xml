@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:text="Daftarkan akun anda sekarang. Semua data yang anda masukan aman !"
                 android:textSize="14sp"
-                android:textColor="#000000"
+
                 android:fontFamily="@font/inter_regular"
                 android:textAlignment="center"
                 app:layout_constraintTop_toBottomOf="@id/registerTitle"
@@ -249,7 +249,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sudah punya akun? Masuk"
-                android:textColor="@color/gray800"
+
                 android:textSize="14sp"
                 android:fontFamily="@font/inter_medium"
                 android:textAlignment="center"

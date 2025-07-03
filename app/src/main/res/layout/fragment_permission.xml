@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Deteksi singkat ini berisi pertanyaan emosi dan kegiatan yang paling dominan anda pada hari ini. Apakah anda ingin melanjutkan?"
         android:textSize="16sp"
-        android:textColor="@color/gray700"
+
         android:fontFamily="@font/inter_regular"
         android:layout_marginBottom="20dp"
         android:textAlignment="center"

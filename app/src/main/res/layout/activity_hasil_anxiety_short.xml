@@ -133,7 +133,7 @@ jawab. Berikut hasil analisa kecemasan nya :"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/btnAnxietyManagement"
-                android:textColor="@color/gray800"
+
                 android:layout_marginTop="20dp"
                 />
 
@@ -162,7 +162,6 @@ jawab. Berikut hasil analisa kecemasan nya :"
                 android:layout_height="wrap_content"
                 android:text="Anda mungkin bisa mengelola ini secara mandiri dengan teknik manajemen stres, latihan relaksasi, dan perubahan gaya hidup seperti tidur cukup dan makan makanan sehat. Jika gejala berlanjut atau memburuk, pertimbangkan untuk berkonsultasi dengan profesional kesehatan."
                 android:textSize="16sp"
-                android:textColor="@color/gray800"
                 android:fontFamily="@font/inter_semi_bold"
                 android:layout_margin="16dp"
                 android:textAlignment="center"

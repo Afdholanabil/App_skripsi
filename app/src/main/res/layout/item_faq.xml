@@ -13,7 +13,7 @@
         android:text="@string/apa_itu_gad_7"
         android:textSize="16sp"
         android:fontFamily="@font/inter_medium"
-        android:textColor="@color/gray600"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -32,7 +32,7 @@
         android:text="Description here"
         android:textSize="14sp"
         android:fontFamily="@font/inter_regular"
-        android:textColor="@color/gray600"
+
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title_faq"

@@ -64,6 +64,7 @@ class ProfileFragment : Fragment() {
             binding.profileEmail.text = email
         }
 
+
         setupNavigation()
     }
 
@@ -85,59 +86,126 @@ class ProfileFragment : Fragment() {
         }
         // Di dalam ProfileFragment.kt, perbarui bagian handleLogout/menuLogout:
         binding.menuLogout.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
+            performLogout()
+        }
+
+    }
+
+    private fun performLogout() {
+        // Tampilkan confirmation dialog terlebih dahulu
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Konfirmasi Logout")
+            .setMessage("Apakah Anda yakin ingin keluar?")
+            .setPositiveButton("Ya") { _, _ ->
+                startLogoutProcess()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun startLogoutProcess() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                showLogoutLoading(true)
                 val userId = sessionManager.sessionUserId.first()
                 if (userId == null) {
                     android.util.Log.e("LogoutFlow", "❌ sessionUserId is NULL, cannot logout")
+                    showLogoutLoading(false)
                     return@launch
                 }
 
-                // ✅ Check for data changes in SQLite before logging out
-                val localUser = userRepository.getUserFromLocal(userId)
-                val firebaseUser = userRepository.getUserFromFirebase(userId)
+                android.util.Log.d("LogoutFlow", "🔄 Starting logout process for user: $userId")
 
-                if (localUser != null && firebaseUser.isSuccess) {
-                    val firebaseData = firebaseUser.getOrNull()
-                    if (firebaseData != localUser.toUserModel()) {
-                        android.util.Log.d("LogoutFlow", "🔄 Data has changed, syncing to Firebase...")
+                try {
+                    val localUser = userRepository.getUserFromLocal(userId)
+                    val firebaseUser = userRepository.getUserFromFirebase(userId)
 
-                        // ✅ Sync to Firebase
-                        val updateResult = userRepository.updateUserToFirebase(localUser)
-                        if (updateResult.isSuccess) {
-                            android.util.Log.d("LogoutFlow", "✅ Data Synced to Firebase before logout")
-                        } else {
-                            android.util.Log.e("LogoutFlow", "❌ Failed to sync data to Firebase before logout")
+                    if (localUser != null && firebaseUser.isSuccess) {
+                        val firebaseData = firebaseUser.getOrNull()
+                        if (firebaseData != localUser.toUserModel()) {
+                            android.util.Log.d("LogoutFlow", "🔄 Data has changed, syncing to Firebase...")
+
+                            val updateResult = userRepository.updateUserToFirebase(localUser)
+                            if (updateResult.isSuccess) {
+                                android.util.Log.d("LogoutFlow", "✅ Data Synced to Firebase before logout")
+                            } else {
+                                android.util.Log.e("LogoutFlow", "❌ Failed to sync data to Firebase before logout")
+                            }
                         }
-                    } else {
-                        android.util.Log.d("LogoutFlow", "🔹 No changes detected, skipping Firebase sync")
                     }
+                } catch (e: Exception) {
+                    android.util.Log.e("LogoutFlow", "Error during data sync: ${e.message}")
                 }
 
-                // Cancel semua notifikasi saat logout
-                val notificationManager = NotificationSchedulerManager(requireContext())
-                notificationManager.cancelRoutineFormAlarms()
-                notificationManager.cancelAlarmNotifications()
+                try {
+                    val notificationManager = NotificationSchedulerManager(requireContext())
+                    notificationManager.cancelRoutineFormAlarms()
+                    notificationManager.cancelAlarmNotifications()
+                } catch (e: Exception) {
+                    android.util.Log.e("LogoutFlow", "Error cancelling notifications: ${e.message}")
+                }
 
-                // Bersihkan data RoutineSessionManager
-                val routineSessionManager = RoutineSessionManager(requireContext())
-                routineSessionManager.clearAllData() // Pastikan method ini ada di RoutineSessionManager
+                try {
+                    val routineSessionManager = RoutineSessionManager(requireContext())
+                    routineSessionManager.clearAllData()
 
-                // Bersihkan data FormSessionManager
-                val formSessionManager = FormSessionManager(requireContext())
-                formSessionManager.resetSession()
+                    val formSessionManager = FormSessionManager(requireContext())
+                    formSessionManager.resetSession()
+                } catch (e: Exception) {
+                    android.util.Log.e("LogoutFlow", "Error clearing session data: ${e.message}")
+                }
 
-                // ✅ Clear session & SQLite
-                sessionManager.clearSession()
-                userRepository.clearLocalDatabase()
+                try {
+                    sessionManager.clearSession()
+                    userRepository.clearLocalDatabase()
+                } catch (e: Exception) {
+                    android.util.Log.e("LogoutFlow", "Error clearing database: ${e.message}")
+                }
 
-                android.util.Log.d("LogoutFlow", "🗑 SQLite Cleared & Session Ended")
-
-                val intent = Intent(requireContext(), LoginActivity::class.java)
+                val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
                 startActivity(intent)
                 requireActivity().finish()
+
+            } catch (e: Exception) {
+                android.util.Log.e("LogoutFlow", "Unexpected error during logout: ${e.message}", e)
+                showLogoutLoading(false)
             }
         }
+    }
 
+    private fun showLogoutLoading(show: Boolean) {
+        if (show) {
+            // Disable logout menu item
+            binding.menuLogout.isEnabled = false
+            binding.menuLogout.alpha = 0.6f
+
+            // Show progress indicator jika ada
+            binding.progressBar.visibility = View.VISIBLE
+
+            // Disable other menu items selama logout
+            binding.menuDiary.isEnabled = false
+            binding.menuVideos.isEnabled = false
+            binding.menuHistory.isEnabled = false
+            binding.menuFaq.isEnabled = false
+            binding.menuAbout.isEnabled = false
+
+        } else {
+            // Re-enable logout menu
+            binding.menuLogout.isEnabled = true
+            binding.menuLogout.alpha = 1.0f
+
+            // Hide progress indicator
+            binding.progressBar.visibility = View.GONE
+
+            // Re-enable other menu items
+            binding.menuDiary.isEnabled = true
+            binding.menuVideos.isEnabled = true
+            binding.menuHistory.isEnabled = true
+            binding.menuFaq.isEnabled = true
+            binding.menuAbout.isEnabled = true
+        }
     }
 
     override fun onDestroyView() {

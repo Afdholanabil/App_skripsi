@@ -14,6 +14,9 @@ class DashboardViewModel(): ViewModel()  {
     private val _userEmail = MutableLiveData<String>()
     val userEmail: LiveData<String> get() = _userEmail
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading : LiveData<Boolean> get() = _loading
+
     fun loadUserFromSQLite(userRepository: UserRepository, userId: String) {
         viewModelScope.launch {
             val localUser = userRepository.getUserFromLocal(userId)

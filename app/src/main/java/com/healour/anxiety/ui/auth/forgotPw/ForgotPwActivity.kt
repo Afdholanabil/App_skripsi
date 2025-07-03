@@ -1,6 +1,7 @@
 package com.healour.anxiety.ui.auth.forgotPw
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -37,7 +38,7 @@ class ForgotPwActivity : AppCompatActivity() {
         }
 
         binding.resetPasswordButton.setOnClickListener {
-            val email = binding.emailReqField.text.toString().trim()
+            val email = binding.emailFPField.text.toString().trim()
             if (email.isEmpty()) {
                 ToastUtils.showToast(this, "Email harus diisi", position = ToastUtils.Position.TOP)
             } else {
@@ -50,6 +51,9 @@ class ForgotPwActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
+        viewModel.loading.observe(this) {isLoading ->
+            showLoading(isLoading)
+        }
         viewModel.resetResult.observe(this, Observer { result ->
             if (result.isSuccess) {
                 ToastUtils.showToast(
@@ -67,19 +71,24 @@ class ForgotPwActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.loading.observe(this, Observer { isLoading ->
-            binding.resetPasswordButton.isEnabled = !isLoading
-        })
+    }
+
+    private fun showLoading(isLoading :Boolean){
+        if (isLoading){
+            binding.progressCircular.visibility = View.VISIBLE
+        }else {
+            binding.progressCircular.visibility = View.GONE
+        }
     }
 
     private fun setButtonState() {
-        val isAllFieldFilled = binding.emailReqField.text.toString().isNotEmpty()
+        val isAllFieldFilled = binding.emailFPField.text.toString().isNotEmpty()
 
         binding.resetPasswordButton.isEnabled = isAllFieldFilled
     }
 
     private fun setupTextWatchers() {
-        binding.emailReqField.addTextChangedListener { setButtonState() }
+        binding.emailFPField.addTextChangedListener { setButtonState() }
 
     }
 
