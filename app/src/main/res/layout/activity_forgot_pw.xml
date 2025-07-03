@@ -64,14 +64,14 @@
         app:boxCornerRadiusBottomEnd="16dp"
         app:hintTextAppearance="@style/HintTextStyle">
 
-        <com.example.app_skripsi.customview.CustomTextField
+        <com.healour.anxiety.customview.CustomTextField
             android:id="@+id/emailReqField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.example.app_skripsi.customview.CustomButton
+    <com.healour.anxiety.customview.CustomButton
         android:id="@+id/resetPasswordButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

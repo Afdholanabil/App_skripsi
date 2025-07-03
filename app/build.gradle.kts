@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.app_skripsi"
+    namespace = "com.healour.anxiety"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.app_skripsi"
+        applicationId = "com.healour.anxiety"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -20,15 +20,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
-//    sp   abi {
-//        isEnable = true
-//        reset()
-//        include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-//        isUniversalApk = true
-//    }
-//    density { isEnable = false }
-//}lits {
 
 
     buildTypes {
