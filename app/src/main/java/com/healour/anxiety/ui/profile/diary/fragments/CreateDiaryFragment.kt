@@ -69,6 +69,14 @@ class CreateDiaryFragment : Fragment() {
         setupSaveButton()
         observeDiarySaveResult()
         setupTextWatchers()
+
+        viewModel.loading.observe(viewLifecycleOwner) {isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            }else{
+                binding.progressBar.visibility = View.GONE
+            }
+        }
     }
 
     private fun setupEmotionSelection() {

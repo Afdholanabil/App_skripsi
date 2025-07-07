@@ -38,8 +38,13 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
 
     fun addDiary(diary: DiaryModel) {
         viewModelScope.launch {
+            _loading.value  = true
             val result = repository.addDiary(diary)
+            if (result.isSuccess){
             _diarySaveResult.value = result
         }
+            _loading.value = false
+        }
+
     }
 }
